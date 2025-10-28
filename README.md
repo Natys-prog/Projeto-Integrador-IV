@@ -7,3 +7,13 @@ Linguagem: Principal PHP + Html
 Banco: MYSQL
 
 API: 
+
+Starting server:
+php -S localhost:8000
+
+# [Setup]
+instalar o PHP:
+powershell -c "& ([ScriptBlock]::Create((irm 'https://www.php.net/include/download-instructions/windows.ps1'))) -Version 8.4"
+
+mysql:
+https://dev.mysql.com/downloads/installer
