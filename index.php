@@ -1,7 +1,16 @@
 <?php
 // index.php - Simple PHP home page
 session_start();
+// Connect to database (adjust config as needed)
+require_once __DIR__ . '/Database/DB.php';
 
+if (isset($_GET['init']) && $_GET['init'] === '1') {
+    // Cria o banco apenas quando acessar /?init=1
+    echo "Criando Banco de Dados...";
+    $db = new Database();
+    // chame o método da classe Database — ajuste o nome do método se diferente
+    $db->createDB();
+}
 // Basic helpers
 function e($str) { return htmlspecialchars((string)$str, ENT_QUOTES, 'UTF-8'); }
 function csrf_token() {
@@ -33,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 // Simple router
 $page = $_GET['page'] ?? 'home';
-$pages = ['home', 'about', 'contact'];
+$pages = ['home', 'about', 'contact', 'Infophp'];
 if (!in_array($page, $pages, true)) {
     $page = 'home';
 }
@@ -64,6 +73,7 @@ if (!in_array($page, $pages, true)) {
             <a href="?page=home">Home</a>
             <a href="?page=about">About</a>
             <a href="?page=contact">Contact</a>
+            <a href="?page=Infophp">Info.php</a>
         </nav>
     </div>
 </header>
@@ -83,6 +93,9 @@ if (!in_array($page, $pages, true)) {
             <h2>About</h2>
             <p>Lightweight example site built with plain PHP. No frameworks required.</p>
         </section>
+
+        <?php elseif ($page === 'Infophp'): ?>
+                <?php include __DIR__ . '/Pages/Info.php'; ?>
 
     <?php elseif ($page === 'contact'): ?>
         <section class="card">
