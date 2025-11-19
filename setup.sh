@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # =================================
-# Laravel Project Setup Script
+# Laravel Project Setup Script (Linux)
 # =================================
 
 set -e  # Exit on any error

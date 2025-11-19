@@ -8,7 +8,9 @@
     <style>
         body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; margin: 0; padding: 0; color: #222; }
         header { background:#0b72b9; color:#fff; padding:1rem; }
+        nav { display: flex; align-items: center; margin-top: 0.5rem; }
         nav a { color:#fff; margin-right:1rem; text-decoration:none; }
+        nav form { margin-left: auto; }
         main { padding:1rem; max-width:900px; margin:0 auto; }
         footer { padding:1rem; text-align:center; color:#666; font-size:.9rem; }
         .card { background:#fff; padding:1rem; border-radius:6px; box-shadow:0 1px 3px rgba(0,0,0,.08); }
@@ -30,6 +32,15 @@
             <a href="{{ route('about') }}">About</a>
             <a href="{{ route('contact') }}">Contact</a>
             <a href="{{ route('info') }}">Info</a>
+            @auth
+                <span style="margin-left: auto; margin-right: 1rem;">Welcome, {{ Auth::user()->name }}!</span>
+                <form method="POST" action="{{ route('logout') }}" style="display: inline;">
+                    @csrf
+                    <button type="submit" style="background: none; border: none; color: #fff; cursor: pointer; text-decoration: underline;">Logout</button>
+                </form>
+            @else
+                <a href="{{ route('login') }}" style="margin-left: auto;">Login</a>
+            @endauth
         </nav>
     </div>
 </header>
