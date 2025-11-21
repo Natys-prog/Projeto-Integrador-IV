@@ -67,6 +67,21 @@
         .logout-btn:hover {
             background: rgba(255,255,255,0.3);
         }
+
+        /* Toggle Button */
+        .toggle-sidebar-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.3rem;
+            cursor: pointer;
+            margin-right: 1rem;
+            transition: transform 0.3s;
+        }
+
+        .toggle-sidebar-btn:hover {
+            transform: scale(1.1);
+        }
         
         /* Sidebar */
         .sidebar {
@@ -78,7 +93,35 @@
             background: #2c3e50;
             color: white;
             overflow-y: auto;
-            transition: transform 0.3s ease;
+            transition: width 0.3s ease, transform 0.3s ease;
+            z-index: 999;
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+        .sidebar.collapsed .sidebar-label {
+            display: none;
+        }
+
+        .sidebar.collapsed .menu-item {
+            padding: 1rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .sidebar.collapsed .menu-item:hover::after {
+            content: attr(data-label);
+            position: absolute;
+            left: 85px;
+            top: 0;
+            background: #34495e;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            white-space: nowrap;
+            font-size: 0.9rem;
+            z-index: 1001;
         }
         
         .sidebar-menu {
@@ -86,7 +129,8 @@
         }
         
         .menu-item {
-            display: block;
+            display: flex;
+            align-items: center;
             padding: 1rem 2rem;
             color: #bdc3c7;
             text-decoration: none;
@@ -104,6 +148,12 @@
         .menu-item i {
             width: 20px;
             margin-right: 1rem;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-label {
+            transition: opacity 0.3s;
         }
         
         /* Main Content */
@@ -112,6 +162,11 @@
             margin-top: 70px;
             padding: 2rem;
             min-height: calc(100vh - 70px);
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.sidebar-collapsed {
+            margin-left: 80px;
         }
         
         .dashboard-grid {
@@ -209,6 +264,7 @@
         /* Responsive */
         @media (max-width: 768px) {
             .sidebar {
+                width: 260px;
                 transform: translateX(-100%);
                 z-index: 1001;
             }
@@ -216,8 +272,22 @@
             .sidebar.active {
                 transform: translateX(0);
             }
+
+            .sidebar.collapsed {
+                width: 260px;
+                transform: translateX(-100%);
+            }
+
+            .sidebar.collapsed.active {
+                transform: translateX(0);
+                width: 260px;
+            }
             
             .main-content {
+                margin-left: 0;
+            }
+
+            .main-content.sidebar-collapsed {
                 margin-left: 0;
             }
             
@@ -243,7 +313,7 @@
     <!-- Header -->
     <header class="header">
         <div style="display: flex; align-items: center;">
-            <button class="menu-toggle" onclick="toggleSidebar()" style="display: none; background: none; border: none; color: white; font-size: 1.5rem; margin-right: 1rem; cursor: pointer;">☰</button>
+            <button class="toggle-sidebar-btn" onclick="toggleSidebarCollapse()" title="Expandir/Recolher">≡</button>
             <h1>📋 Sistema de Gestão EPI</h1>
         </div>
         
@@ -267,23 +337,23 @@
     <!-- Sidebar -->
     <nav class="sidebar">
         <div class="sidebar-menu">
-            <a href="{{ route('home') }}" class="menu-item active">
-                <i>🏠</i> Dashboard
+            <a href="{{ route('home') }}" class="menu-item active" data-label="Dashboard">
+                <i>🏠</i> <span class="sidebar-label">Dashboard</span>
             </a>
-            <a href="#" class="menu-item">
-                <i>🦺</i> EPIs
+            <a href="#" class="menu-item" data-label="EPIs">
+                <i>🦺</i> <span class="sidebar-label">EPIs</span>
             </a>
-            <a href="#" class="menu-item">
-                <i>👥</i> Funcionários
+            <a href="#" class="menu-item" data-label="Funcionários">
+                <i>👥</i> <span class="sidebar-label">Funcionários</span>
             </a>
-            <a href="#" class="menu-item">
-                <i>📊</i> Relatórios
+            <a href="#" class="menu-item" data-label="Relatórios">
+                <i>📊</i> <span class="sidebar-label">Relatórios</span>
             </a>
-            <a href="#" class="menu-item">
-                <i>⚙️</i> Configurações
+            <a href="#" class="menu-item" data-label="Configurações">
+                <i>⚙️</i> <span class="sidebar-label">Configurações</span>
             </a>
-            <a href="#" class="menu-item">
-                <i>❗</i> Alertas
+            <a href="#" class="menu-item" data-label="Alertas">
+                <i>❗</i> <span class="sidebar-label">Alertas</span>
             </a>
         </div>
     </nav>
@@ -308,18 +378,36 @@
     </main>
 
     <script>
-        function toggleSidebar() {
+        function toggleSidebarCollapse() {
             const sidebar = document.querySelector('.sidebar');
-            sidebar.classList.toggle('active');
+            const mainContent = document.querySelector('.main-content');
+            
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('sidebar-collapsed');
+            
+            // Salvar preferência no localStorage
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            localStorage.setItem('sidebarCollapsed', isCollapsed);
         }
+
+        // Restaurar preferência ao carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            if (sidebarCollapsed) {
+                const sidebar = document.querySelector('.sidebar');
+                const mainContent = document.querySelector('.main-content');
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('sidebar-collapsed');
+            }
+        });
 
         // Close sidebar when clicking outside on mobile
         document.addEventListener('click', function(event) {
             if (window.innerWidth <= 768) {
                 const sidebar = document.querySelector('.sidebar');
-                const menuToggle = document.querySelector('.menu-toggle');
+                const toggleBtn = document.querySelector('.toggle-sidebar-btn');
                 
-                if (!sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
+                if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
                     sidebar.classList.remove('active');
                 }
             }
