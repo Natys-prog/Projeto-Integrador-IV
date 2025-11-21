@@ -3,7 +3,8 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Funcionario;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\User;
 
 class UsuarioSeeder extends Seeder
 {
