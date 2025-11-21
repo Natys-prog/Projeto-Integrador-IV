@@ -4,21 +4,25 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Artisan;
 
 class DatabaseInitializationService
 {
     public function createDatabase()
     {
         try {
-            // You can adapt your existing DB.php logic here
-            // This is a Laravel way to handle database operations
+            // Run Laravel migrations
+            \Artisan::call('migrate', ['--force' => true]);
             
-            // Example: Create tables if they don't exist
-            $this->createUsersTable();
-            $this->createContactsTable();
+            // Run seeders to populate data
+            \Artisan::call('db:seed', ['--force' => true]);
             
-            Log::info('Database initialized successfully');
-            return ['success' => true, 'message' => 'Database initialized successfully'];
+            Log::info('Database initialized successfully with EPIs and Funcionários data');
+            return [
+                'success' => true, 
+                'message' => 'Database initialized successfully with EPIs and Funcionários data. 
+                             You can now see real data in the dashboard!'
+            ];
             
         } catch (\Exception $e) {
             Log::error('Database initialization failed: ' . $e->getMessage());
