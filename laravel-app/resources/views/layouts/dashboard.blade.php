@@ -337,22 +337,22 @@
     <!-- Sidebar -->
     <nav class="sidebar">
         <div class="sidebar-menu">
-            <a href="{{ route('home') }}" class="menu-item active" data-label="Dashboard">
+            <a href="{{ route('home') }}" class="menu-item {{ Route::currentRouteName() === 'home' ? 'active' : '' }}" data-label="Dashboard">
                 <i>🏠</i> <span class="sidebar-label">Dashboard</span>
             </a>
-            <a href="#" class="menu-item" data-label="EPIs">
+            <a href="{{ route('epi.index') }}" class="menu-item {{ Route::currentRouteName() === 'epi.index' ? 'active' : '' }}" data-label="EPIs">
                 <i>🦺</i> <span class="sidebar-label">EPIs</span>
             </a>
-            <a href="#" class="menu-item" data-label="Funcionários">
+            <a href="funcionarios" class="menu-item {{ Route::currentRouteName() === 'funcionarios.index' ? 'active' : '' }}" data-label="Funcionários">
                 <i>👥</i> <span class="sidebar-label">Funcionários</span>
             </a>
-            <a href="#" class="menu-item" data-label="Relatórios">
+            <a href="relatorios" class="menu-item {{ Route::currentRouteName() === 'relatorios.index' ? 'active' : '' }}" data-label="Relatórios">
                 <i>📊</i> <span class="sidebar-label">Relatórios</span>
             </a>
-            <a href="#" class="menu-item" data-label="Configurações">
+            <a href="configuracoes" class="menu-item {{ Route::currentRouteName() === 'configuracoes.index' ? 'active' : '' }}" data-label="Configurações">
                 <i>⚙️</i> <span class="sidebar-label">Configurações</span>
             </a>
-            <a href="#" class="menu-item" data-label="Alertas">
+            <a href="alertas" class="menu-item {{ Route::currentRouteName() === 'alertas.index' ? 'active' : '' }}" data-label="Alertas">
                 <i>❗</i> <span class="sidebar-label">Alertas</span>
             </a>
         </div>

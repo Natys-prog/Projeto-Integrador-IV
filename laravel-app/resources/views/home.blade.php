@@ -92,7 +92,7 @@
                 </li>
             </ul>
             <div style="margin-top: 1.5rem;">
-                <a href="#" style="background: #667eea; color: white; padding: 0.75rem 1.5rem; border-radius: 6px; text-decoration: none; display: inline-block;">
+                <a href="epi" style="background: #667eea; color: white; padding: 0.75rem 1.5rem; border-radius: 6px; text-decoration: none; display: inline-block;">
                     Ver Todos os EPIs
                 </a>
             </div>
