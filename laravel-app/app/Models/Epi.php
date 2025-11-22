@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Epi extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes; // Ativa soft deletes
 
     protected $table = 'epis';
     
@@ -28,6 +29,8 @@ class Epi extends Model
         'data_aquisicao' => 'date',
         'data_vencimento' => 'date',
     ];
+
+    protected $dates = ['deleted_at']; // Define deleted_at como data
 
     /**
      * Relacionamento com Funcionário
