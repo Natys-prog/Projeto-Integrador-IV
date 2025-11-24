@@ -14,21 +14,21 @@ return new class extends Migration
         Schema::create('funcionarios', function (Blueprint $table) {
             $table->id();
             $table->string('nome');
-            $table->string('cpf', 11)->unique();
+            $table->string('cpf')->unique();
             $table->string('email')->unique();
             $table->string('telefone')->nullable();
-            $table->string('departamento');
-            $table->string('cargo');
             $table->date('data_admissao');
-            $table->enum('status', ['ativo', 'inativo', 'afastado'])->default('ativo');
-            $table->text('endereco')->nullable();
-            $table->string('cep', 8)->nullable();
+            $table->date('data_demissao')->nullable();
+            $table->string('cargo');
+            $table->string('departamento');
+            $table->decimal('salario', 10, 2)->nullable();
+            $table->string('endereco')->nullable();
             $table->string('cidade')->nullable();
             $table->string('estado', 2)->nullable();
+            $table->string('cep')->nullable();
+            $table->enum('status', ['ativo', 'inativo'])->default('ativo');
+            $table->softDeletes();
             $table->timestamps();
-
-            $table->index(['departamento', 'status']);
-            $table->index('data_admissao');
         });
     }
 

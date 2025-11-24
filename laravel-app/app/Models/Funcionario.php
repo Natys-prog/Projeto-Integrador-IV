@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Funcionario extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'funcionarios';
     
@@ -19,6 +20,7 @@ class Funcionario extends Model
         'departamento',
         'cargo',
         'data_admissao',
+        'data_demissao',
         'status',
         'endereco',
         'cep',
@@ -29,6 +31,8 @@ class Funcionario extends Model
     protected $casts = [
         'data_admissao' => 'date',
     ];
+
+    protected $dates = ['deleted_at'];
 
     /**
      * Relacionamento com EPIs
