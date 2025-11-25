@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test - EPI Management</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin-bottom: 30px; border: 1px solid #ccc; padding: 15px; }
+        .response { background: #f5f5f5; padding: 10px; margin: 10px 0; white-space: pre-wrap; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        input, select { padding: 5px; margin: 5px; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>API Test - EPI Management System</h1>
+    
+    <div class="test-section">
+        <h2>1. EPI Statistics</h2>
+        <button onclick="testEpiStats()">Get EPI Stats</button>
+        <div id="epi-stats-response" class="response"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Funcionários Statistics</h2>
+        <button onclick="testFuncionarioStats()">Get Funcionários Stats</button>
+        <div id="funcionario-stats-response" class="response"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. List EPIs</h2>
+        <button onclick="testListEpis()">List EPIs (first 3)</button>
+        <div id="list-epis-response" class="response"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Create New EPI</h2>
+        <div>
+            <input type="text" id="epi-nome" placeholder="Nome do EPI" value="Capacete Teste API">
+            <select id="epi-tipo">
+                <option value="capacete">Capacete</option>
+                <option value="oculos">Óculos</option>
+                <option value="luvas">Luvas</option>
+                <option value="botas">Botas</option>
+            </select>
+            <input type="text" id="epi-codigo" placeholder="Código" value="TEST001">
+            <input type="date" id="epi-data" value="2024-01-15">
+            <select id="epi-status">
+                <option value="ativo">Ativo</option>
+                <option value="inativo">Inativo</option>
+            </select>
+            <button onclick="testCreateEpi()">Create EPI</button>
+        </div>
+        <div id="create-epi-response" class="response"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>5. List Funcionários</h2>
+        <button onclick="testListFuncionarios()">List Funcionários (first 3)</button>
+        <div id="list-funcionarios-response" class="response"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:8000/api';
+
+        async function apiCall(endpoint, options = {}) {
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                return await response.json();
+            } catch (error) {
+                return { error: error.message };
+            }
+        }
+
+        async function testEpiStats() {
+            const result = await apiCall('/epis/stats');
+            document.getElementById('epi-stats-response').textContent = JSON.stringify(result, null, 2);
+        }
+
+        async function testFuncionarioStats() {
+            const result = await apiCall('/funcionarios/stats');
+            document.getElementById('funcionario-stats-response').textContent = JSON.stringify(result, null, 2);
+        }
+
+        async function testListEpis() {
+            const result = await apiCall('/epis?per_page=3');
+            document.getElementById('list-epis-response').textContent = JSON.stringify(result, null, 2);
+        }
+
+        async function testListFuncionarios() {
+            const result = await apiCall('/funcionarios?per_page=3');
+            document.getElementById('list-funcionarios-response').textContent = JSON.stringify(result, null, 2);
+        }
+
+        async function testCreateEpi() {
+            const data = {
+                nome: document.getElementById('epi-nome').value,
+                tipo: document.getElementById('epi-tipo').value,
+                codigo: document.getElementById('epi-codigo').value,
+                data_aquisicao: document.getElementById('epi-data').value,
+                status: document.getElementById('epi-status').value,
+                descricao: 'Capacete criado via API para teste'
+            };
+
+            const result = await apiCall('/epis', {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+            
+            document.getElementById('create-epi-response').textContent = JSON.stringify(result, null, 2);
+        }
+    </script>
+</body>
+</html>
