@@ -26,18 +26,14 @@
         }
 
         .modal-overlay.active {
-            display: flex;
+            display: flex !important;
             justify-content: center;
             align-items: center;
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         /* Modal Container */
@@ -77,6 +73,7 @@
         .modal-header h2 {
             font-size: 1.5rem;
             font-weight: 600;
+            margin: 0;
         }
 
         .close-btn {
@@ -87,6 +84,7 @@
             cursor: pointer;
             transition: transform 0.2s;
             line-height: 1;
+            padding: 0;
         }
 
         .close-btn:hover {
@@ -280,8 +278,8 @@
         <div class="modal-container">
             <!-- Header -->
             <div class="modal-header">
-                <h2>📋 Cadastro de EPI</h2>
-                <button class="close-btn" onclick="fecharModal()" title="Fechar">&times;</button>
+                <h2 id="modalTitle">📋 Novo EPI</h2>
+                <button type="button" class="close-btn" onclick="fecharModal()" title="Fechar">&times;</button>
             </div>
 
             <!-- Body -->
@@ -292,8 +290,9 @@
                 <div class="alert alert-warning" id="warningAlert"></div>
 
                 <!-- Form -->
-                <form id="cadastroForm" onsubmit="salvarEPI(event)">
+                <form id="cadastroForm">
                     @csrf
+                    <input type="hidden" id="epiId" name="epi_id" value="">
 
                     <!-- Nome do EPI -->
                     <div class="form-group">
@@ -420,59 +419,133 @@
 
             <!-- Footer -->
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="fecharModal()">
+                <button type="button" class="btn btn-secondary" onclick="fecharModal()">
                     ✕ Cancelar
                 </button>
-                <button class="btn btn-primary" onclick="enviarFormulario()">
+                <button type="button" class="btn btn-primary" onclick="enviarFormulario()">
                     <span class="loading-spinner" id="loadingSpinner"></span>
-                    💾 Salvar
+                    <span id="btnText">💾 Salvar</span>
                 </button>
             </div>
         </div>
     </div>
 
     <script>
-        // Abrir Modal
+        let modoEdicao = false;
+
+        // Abrir Modal para novo EPI
         function abrirModal() {
-            const modal = document.getElementById('cadastroModal');
-            modal.classList.add('active');
+            modoEdicao = false;
+            document.getElementById('modalTitle').textContent = '📋 Novo EPI';
+            document.getElementById('btnText').textContent = '💾 Salvar';
+            document.getElementById('epiId').value = '';
+            limparFormulario();
+            document.getElementById('cadastroModal').classList.add('active');
             document.body.style.overflow = 'hidden';
         }
 
         // Fechar Modal
         function fecharModal() {
-            const modal = document.getElementById('cadastroModal');
-            modal.classList.remove('active');
+            document.getElementById('cadastroModal').classList.remove('active');
             document.body.style.overflow = 'auto';
             limparFormulario();
+            modoEdicao = false;
         }
 
         // Limpar Formulário
         function limparFormulario() {
             document.getElementById('cadastroForm').reset();
-            document.getElementById('successAlert').classList.remove('active');
-            document.getElementById('errorAlert').classList.remove('active');
-            document.getElementById('warningAlert').classList.remove('active');
+            const successAlert = document.getElementById('successAlert');
+            const errorAlert = document.getElementById('errorAlert');
+            const warningAlert = document.getElementById('warningAlert');
+            
+            if (successAlert) successAlert.classList.remove('active');
+            if (errorAlert) errorAlert.classList.remove('active');
+            if (warningAlert) warningAlert.classList.remove('active');
+        }
+
+        // Mostrar Alertas
+        function mostraAlerta(mensagem, tipo) {
+            const alertId = `${tipo}Alert`;
+            const alertElement = document.getElementById(alertId);
+            
+            if (alertElement) {
+                alertElement.textContent = mensagem;
+                alertElement.classList.add('active');
+
+                setTimeout(() => {
+                    alertElement.classList.remove('active');
+                }, 5000);
+            } else {
+                console.warn(`Alert element com ID ${alertId} não encontrado`);
+            }
         }
 
         // Enviar Formulário
         function enviarFormulario() {
             const form = document.getElementById('cadastroForm');
             if (form.checkValidity() === false) {
-                event.preventDefault();
-                event.stopPropagation();
-                form.classList.add('was-validated');
                 mostraAlerta('Por favor, preencha todos os campos obrigatórios.', 'warning');
                 return;
             }
 
-            salvarEPI(event);
+            if (modoEdicao) {
+                atualizarEPI();
+            } else {
+                salvarEPI();
+            }
         }
 
-        // Salvar EPI
-        async function salvarEPI(event) {
-            event.preventDefault();
+        // Editar EPI
+        async function editarEPI(id) {
+            console.log('Editando EPI ID:', id);
+            
+            try {
+                const response = await fetch(`/api/epis/${id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    }
+                });
 
+                const data = await response.json();
+                
+                if (data.success) {
+                    const epi = data.data;
+                    console.log('EPI encontrado:', epi);
+                    
+                    // Preencher formulário
+                    document.getElementById('epiId').value = epi.id;
+                    document.getElementById('nome').value = epi.nome || '';
+                    document.getElementById('tipo').value = epi.tipo || '';
+                    document.getElementById('categoria').value = epi.categoria || '';
+                    document.getElementById('quantidade').value = epi.quantidade || 0;
+                    document.getElementById('norma').value = epi.norma || '';
+                    document.getElementById('data_validade').value = epi.data_validade || '';
+                    document.getElementById('data_aquisicao').value = epi.data_aquisicao || '';
+                    document.getElementById('descricao').value = epi.descricao || '';
+                    document.getElementById('fabricante').value = epi.fabricante || '';
+                    document.getElementById('modelo').value = epi.modelo || '';
+                    
+                    // Trocar para modo edição
+                    modoEdicao = true;
+                    document.getElementById('modalTitle').textContent = '✏️ Editar EPI';
+                    document.getElementById('btnText').textContent = '🔄 Atualizar';
+                    
+                    document.getElementById('cadastroModal').classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    mostraAlerta(data.message || 'EPI não encontrado', 'danger');
+                }
+            } catch (error) {
+                console.error('Erro ao buscar EPI:', error);
+                mostraAlerta('Erro ao buscar EPI: ' + error.message, 'danger');
+            }
+        }
+
+        // Salvar novo EPI
+        async function salvarEPI() {
             const form = document.getElementById('cadastroForm');
             const formData = new FormData(form);
             const loadingSpinner = document.getElementById('loadingSpinner');
@@ -493,34 +566,86 @@
 
                 if (response.ok) {
                     mostraAlerta('EPI cadastrado com sucesso!', 'success');
-                    limparFormulario();
                     
                     setTimeout(() => {
                         fecharModal();
-                        location.reload(); // Atualizar página para ver o novo EPI
+                        location.reload();
                     }, 2000);
                 } else {
-                    const erro = data.message || 'Erro ao cadastrar EPI';
-                    mostraAlerta(erro, 'danger');
+                    mostraAlerta(data.message || 'Erro ao cadastrar EPI', 'danger');
                 }
             } catch (error) {
                 console.error('Erro:', error);
-                mostraAlerta('Erro ao processar requisição. Tente novamente.', 'danger');
+                mostraAlerta('Erro ao processar requisição.', 'danger');
             } finally {
                 loadingSpinner.classList.remove('active');
             }
         }
 
-        // Mostrar Alertas
-        function mostraAlerta(mensagem, tipo) {
-            const alertId = `${tipo}Alert`;
-            const alertElement = document.getElementById(alertId);
-            alertElement.textContent = mensagem;
-            alertElement.classList.add('active');
+        // Atualizar EPI
+        async function atualizarEPI() {
+            const id = document.getElementById('epiId').value;
+            const form = document.getElementById('cadastroForm');
+            const formData = new FormData(form);
+            const loadingSpinner = document.getElementById('loadingSpinner');
 
-            setTimeout(() => {
-                alertElement.classList.remove('active');
-            }, 5000);
+            loadingSpinner.classList.add('active');
+
+            try {
+                const response = await fetch(`/api/epis/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    mostraAlerta('EPI atualizado com sucesso!', 'success');
+                    
+                    setTimeout(() => {
+                        fecharModal();
+                        location.reload();
+                    }, 2000);
+                } else {
+                    mostraAlerta(data.message || 'Erro ao atualizar', 'danger');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                mostraAlerta('Erro ao processar requisição.', 'danger');
+            } finally {
+                loadingSpinner.classList.remove('active');
+            }
+        }
+
+        // Deletar EPI
+        async function deletarEPI(id) {
+            if (confirm('Tem certeza que deseja deletar este EPI?')) {
+                try {
+                    const response = await fetch(`/api/epis/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json',
+                        }
+                    });
+
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        mostraAlerta(data.message, 'success');
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        mostraAlerta(data.message || 'Erro ao deletar', 'danger');
+                    }
+                } catch (error) {
+                    console.error('Erro:', error);
+                    mostraAlerta('Erro ao deletar EPI', 'danger');
+                }
+            }
         }
 
         // Fechar modal ao clicar fora

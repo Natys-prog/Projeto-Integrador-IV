@@ -26,15 +26,15 @@
         <tbody>
             @forelse($epis as $epi)
             <tr style="border-bottom: 1px solid #ecf0f1; transition: background 0.3s;">
-                <td style="padding: 1rem;">{{ $epi['nome'] ?? 'N/A' }}</td>
-                <td style="padding: 1rem;">{{ $epi['tipo'] ?? 'N/A' }}</td>
-                <td style="padding: 1rem;">{{ $epi['quantidade'] ?? 0 }}</td>
-                <td style="padding: 1rem;">{{ $epi['data_validade'] ?? 'N/A' }}</td>
+                <td style="padding: 1rem;">{{ $epi->nome }}</td>
+                <td style="padding: 1rem;">{{ $epi->tipo }}</td>
+                <td style="padding: 1rem;">{{ $epi->quantidade }}</td>
+                <td style="padding: 1rem;">{{ $epi->data_validade ?? 'N/A' }}</td>
                 <td style="padding: 1rem; text-align: center;">
-                    <button style="background: #3498db; color: white; padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">
+                    <button onclick="editarEPI({{ $epi->id }})" style="background: #3498db; color: white; padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">
                         ✏️ Editar
                     </button>
-                    <button style="background: #e74c3c; color: white; padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer;">
+                    <button onclick="deletarEPI({{ $epi->id }})" style="background: #e74c3c; color: white; padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer;">
                         🗑️ Deletar
                     </button>
                 </td>
@@ -42,7 +42,7 @@
             @empty
             <tr>
                 <td colspan="5" style="padding: 2rem; text-align: center; color: #7f8c8d;">
-                    Nenhum EPI cadastrado. <a href="#" onclick="abrirModal()" style="color: #667eea; text-decoration: none; font-weight: 600;">Clique aqui para criar um.</a>
+                    Nenhum EPI cadastrado. <a href="#" onclick="abrirModal(); return false;" style="color: #667eea; text-decoration: none; font-weight: 600;">Clique aqui para criar um.</a>
                 </td>
             </tr>
             @endforelse
@@ -50,7 +50,7 @@
     </table>
 </div>
 
+@endsection
+
 <!-- Incluir o Modal de Cadastro -->
 @include('layouts.cadastroepi')
-
-@endsection

@@ -339,11 +339,11 @@
                         <div class="form-group">
                             <label for="quantidade">CPF *</label>
                             <input 
-                                type="number" 
+                                type="string" 
                                 id="cpf" 
                                 name="cpf" 
-                                placeholder="0"
-                                min="9"
+                                placeholder="000.000.000-00"
+                                min="0"
                                 required
                             >
                         </div>

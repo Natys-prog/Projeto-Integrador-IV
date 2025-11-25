@@ -18,6 +18,7 @@
             <tr style="background: #f8f9fa; border-bottom: 2px solid #e0e0e0;">
                 <th style="padding: 1rem; text-align: left; font-weight: 600;">Nome</th>
                 <th style="padding: 1rem; text-align: left; font-weight: 600;">CPF</th>
+                <th style="padding: 1rem; text-align: left; font-weight: 600;">Setor/Departamento</th>
                 <th style="padding: 1rem; text-align: left; font-weight: 600;">Admissão</th>
                 <th style="padding: 1rem; text-align: center; font-weight: 600;">Ações</th>
             </tr>
@@ -27,6 +28,7 @@
             <tr style="border-bottom: 1px solid #ecf0f1; transition: background 0.3s;">
                 <td style="padding: 1rem;">{{ $func['nome'] ?? 'N/A' }}</td>
                 <td style="padding: 1rem;">{{ $func['cpf'] ?? 'N/A' }}</td>
+                <td style="padding: 1rem;">{{ $func['departamento'] ?? 'N/A' }}</td>
                 <td style="padding: 1rem;">{{ $func['data_admissao'] ?? 0 }}</td>
                 <td style="padding: 1rem; text-align: center;">
                     <button style="background: #3498db; color: white; padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">
