@@ -14,15 +14,15 @@ class Epi extends Model
     
     protected $fillable = [
         'nome',
-        'tipo',
-        'descricao',
+        'tipo_epi_id', // Mudança: agora é FK para tipos_epi
         'codigo',
-        'data_aquisicao',
-        'data_vencimento',
         'status',
         'fabricante',
         'lote',
         'funcionario_id',
+        'data_aquisicao',
+        'data_vencimento',
+        'descricao',
     ];
 
     protected $casts = [
@@ -31,6 +31,14 @@ class Epi extends Model
     ];
 
     protected $dates = ['deleted_at']; // Define deleted_at como data
+
+    /**
+     * Relacionamento com TipoEpi
+     */
+    public function tipoEpi()
+    {
+        return $this->belongsTo(TipoEpi::class, 'tipo_epi_id');
+    }
 
     /**
      * Relacionamento com Funcionário

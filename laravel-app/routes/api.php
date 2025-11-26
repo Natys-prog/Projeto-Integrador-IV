@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Api\EpiController;
 use App\Http\Controllers\Api\FuncionarioController;
+use App\Models\Funcionario;
+use App\Models\TipoEpi;
 use Illuminate\Support\Facades\Route;
 
 // Rotas de EPIs - API
@@ -30,4 +32,20 @@ Route::prefix('funcionarios')->group(function () {
     Route::post('{id}/restore', [FuncionarioController::class, 'restore']); // POST /api/funcionarios/1/restore
     Route::delete('{id}/force', [FuncionarioController::class, 'forceDelete']); // DELETE /api/funcionarios/1/force
     Route::get('{id}/epis', [FuncionarioController::class, 'epis']);       // GET /api/funcionarios/1/epis
+});
+
+// API para listar funcionários (para uso nos selects)
+Route::get('/funcionarios', function () {
+    return Funcionario::where('status', 'ativo')
+                     ->select('id', 'nome', 'departamento')
+                     ->orderBy('nome')
+                     ->get();
+});
+
+// API para listar tipos de EPI
+Route::get('/tipos-epi', function () {
+    return TipoEpi::ativo()
+                  ->select('id', 'nome', 'codigo', 'icone', 'cor')
+                  ->orderBy('nome')
+                  ->get();
 });

@@ -301,83 +301,102 @@
                             type="text" 
                             id="nome" 
                             name="nome" 
-                            placeholder="Ex: Capacete de Segurança"
+                            placeholder="Ex: Capacete de Segurança Branco"
                             required
                         >
                     </div>
 
-                    <!-- Tipo e Categoria -->
+                    <!-- Tipo do EPI -->
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="tipo">Tipo *</label>
+                            <label for="tipo">Tipo de EPI *</label>
                             <select id="tipo" name="tipo" required>
                                 <option value="">Selecione o tipo</option>
                                 <option value="capacete">Capacete</option>
-                                <option value="luva">Luva</option>
-                                <option value="bota">Bota</option>
-                                <option value="oculos">Óculos</option>
+                                <option value="oculos">Óculos de Proteção</option>
+                                <option value="luvas">Luvas</option>
+                                <option value="botas">Botas de Segurança</option>
+                                <option value="cinto_seguranca">Cinto de Segurança</option>
                                 <option value="mascara">Máscara</option>
-                                <option value="coletes">Colete</option>
-                                <option value="outro">Outro</option>
+                                <option value="protetor_auditivo">Protetor Auditivo</option>
+                                <option value="colete_refletivo">Colete Refletivo</option>
+                                <option value="outros">Outros</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label for="categoria">Categoria *</label>
-                            <select id="categoria" name="categoria" required>
-                                <option value="">Selecione a categoria</option>
-                                <option value="protecao_cabeca">Proteção da Cabeça</option>
-                                <option value="protecao_olhos">Proteção dos Olhos</option>
-                                <option value="protecao_auricular">Proteção Auricular</option>
-                                <option value="protecao_respiratoria">Proteção Respiratória</option>
-                                <option value="protecao_membros">Proteção de Membros</option>
-                                <option value="protecao_corpo">Proteção do Corpo</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Quantidade e Norma -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="quantidade">Quantidade em Estoque *</label>
+                            <label for="codigo">Código *</label>
                             <input 
-                                type="number" 
-                                id="quantidade" 
-                                name="quantidade" 
-                                placeholder="0"
-                                min="0"
+                                type="text" 
+                                id="codigo" 
+                                name="codigo" 
+                                placeholder="Ex: CAP001"
                                 required
                             >
                         </div>
+                    </div>
+
+                    <!-- Status e Fabricante -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select id="status" name="status">
+                                <option value="ativo">Ativo</option>
+                                <option value="inativo">Inativo</option>
+                                <option value="manutencao">Manutenção</option>
+                                <option value="descartado">Descartado</option>
+                            </select>
+                        </div>
 
                         <div class="form-group">
-                            <label for="norma">Norma Técnica</label>
+                            <label for="fabricante">Fabricante</label>
                             <input 
                                 type="text" 
-                                id="norma" 
-                                name="norma" 
-                                placeholder="Ex: NBR 12245"
+                                id="fabricante" 
+                                name="fabricante" 
+                                placeholder="Ex: 3M, MSA, Honeywell"
                             >
                         </div>
                     </div>
 
-                    <!-- Data de Validade -->
+                    <!-- Lote e Funcionário -->
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="data_validade">Data de Validade</label>
+                            <label for="lote">Lote</label>
                             <input 
-                                type="date" 
-                                id="data_validade" 
-                                name="data_validade"
+                                type="text" 
+                                id="lote" 
+                                name="lote" 
+                                placeholder="Ex: LT2024001"
                             >
                         </div>
 
+                        <div class="form-group">
+                            <label for="funcionario_id">Funcionário (Opcional)</label>
+                            <select id="funcionario_id" name="funcionario_id">
+                                <option value="">Não atribuído</option>
+                                <!-- Funcionários serão carregados via JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Data de Aquisição e Vencimento -->
+                    <div class="form-row">
                         <div class="form-group">
                             <label for="data_aquisicao">Data de Aquisição</label>
                             <input 
                                 type="date" 
                                 id="data_aquisicao" 
                                 name="data_aquisicao"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="data_vencimento">Data de Vencimento</label>
+                            <input 
+                                type="date" 
+                                id="data_vencimento" 
+                                name="data_vencimento"
                             >
                         </div>
                     </div>
@@ -390,29 +409,6 @@
                             name="descricao" 
                             placeholder="Adicione informações adicionais sobre o EPI..."
                         ></textarea>
-                    </div>
-
-                    <!-- Fabricante e Modelo -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="fabricante">Fabricante</label>
-                            <input 
-                                type="text" 
-                                id="fabricante" 
-                                name="fabricante" 
-                                placeholder="Ex: 3M do Brasil"
-                            >
-                        </div>
-
-                        <div class="form-group">
-                            <label for="modelo">Modelo</label>
-                            <input 
-                                type="text" 
-                                id="modelo" 
-                                name="modelo" 
-                                placeholder="Ex: H-700"
-                            >
-                        </div>
                     </div>
                 </form>
             </div>
@@ -442,6 +438,7 @@
             limparFormulario();
             document.getElementById('cadastroModal').classList.add('active');
             document.body.style.overflow = 'hidden';
+            carregarFuncionarios(); // Carregar funcionários ao abrir modal
         }
 
         // Fechar Modal
@@ -455,13 +452,11 @@
         // Limpar Formulário
         function limparFormulario() {
             document.getElementById('cadastroForm').reset();
-            const successAlert = document.getElementById('successAlert');
-            const errorAlert = document.getElementById('errorAlert');
-            const warningAlert = document.getElementById('warningAlert');
-            
-            if (successAlert) successAlert.classList.remove('active');
-            if (errorAlert) errorAlert.classList.remove('active');
-            if (warningAlert) warningAlert.classList.remove('active');
+            const alerts = ['successAlert', 'errorAlert', 'warningAlert'];
+            alerts.forEach(alertId => {
+                const alert = document.getElementById(alertId);
+                if (alert) alert.classList.remove('active');
+            });
         }
 
         // Mostrar Alertas
@@ -476,16 +471,15 @@
                 setTimeout(() => {
                     alertElement.classList.remove('active');
                 }, 5000);
-            } else {
-                console.warn(`Alert element com ID ${alertId} não encontrado`);
             }
         }
 
         // Enviar Formulário
         function enviarFormulario() {
             const form = document.getElementById('cadastroForm');
-            if (form.checkValidity() === false) {
+            if (!form.checkValidity()) {
                 mostraAlerta('Por favor, preencha todos os campos obrigatórios.', 'warning');
+                form.reportValidity();
                 return;
             }
 
@@ -509,24 +503,31 @@
                     }
                 });
 
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
                 const data = await response.json();
                 
                 if (data.success) {
                     const epi = data.data;
                     console.log('EPI encontrado:', epi);
                     
+                    // Aguardar funcionários carregarem antes de preencher
+                    await carregarFuncionarios();
+                    
                     // Preencher formulário
                     document.getElementById('epiId').value = epi.id;
                     document.getElementById('nome').value = epi.nome || '';
                     document.getElementById('tipo').value = epi.tipo || '';
-                    document.getElementById('categoria').value = epi.categoria || '';
-                    document.getElementById('quantidade').value = epi.quantidade || 0;
-                    document.getElementById('norma').value = epi.norma || '';
-                    document.getElementById('data_validade').value = epi.data_validade || '';
-                    document.getElementById('data_aquisicao').value = epi.data_aquisicao || '';
-                    document.getElementById('descricao').value = epi.descricao || '';
+                    document.getElementById('codigo').value = epi.codigo || '';
+                    document.getElementById('status').value = epi.status || 'ativo';
                     document.getElementById('fabricante').value = epi.fabricante || '';
-                    document.getElementById('modelo').value = epi.modelo || '';
+                    document.getElementById('lote').value = epi.lote || '';
+                    document.getElementById('funcionario_id').value = epi.funcionario_id || '';
+                    document.getElementById('data_aquisicao').value = epi.data_aquisicao || '';
+                    document.getElementById('data_vencimento').value = epi.data_vencimento || '';
+                    document.getElementById('descricao').value = epi.descricao || '';
                     
                     // Trocar para modo edição
                     modoEdicao = true;
@@ -544,39 +545,64 @@
             }
         }
 
-        // Salvar novo EPI
-        async function salvarEPI() {
+        // Criar objeto com dados do formulário
+        function obterDadosFormulario() {
             const form = document.getElementById('cadastroForm');
             const formData = new FormData(form);
-            const loadingSpinner = document.getElementById('loadingSpinner');
+            
+            return {
+                nome: formData.get('nome'),
+                tipo: formData.get('tipo'),
+                codigo: formData.get('codigo'),
+                status: formData.get('status') || 'ativo',
+                fabricante: formData.get('fabricante'),
+                lote: formData.get('lote'),
+                funcionario_id: formData.get('funcionario_id') || null,
+                data_aquisicao: formData.get('data_aquisicao') || null,
+                data_vencimento: formData.get('data_vencimento') || null,
+                descricao: formData.get('descricao'),
+            };
+        }
 
+        // Salvar novo EPI
+        async function salvarEPI() {
+            const loadingSpinner = document.getElementById('loadingSpinner');
             loadingSpinner.classList.add('active');
 
             try {
+                const dadosEPI = obterDadosFormulario();
+
                 const response = await fetch('/api/epis', {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                         'Accept': 'application/json',
+                        'Content-Type': 'application/json',
                     },
-                    body: formData
+                    body: JSON.stringify(dadosEPI)
                 });
 
                 const data = await response.json();
 
-                if (response.ok) {
+                if (data.success) {
                     mostraAlerta('EPI cadastrado com sucesso!', 'success');
+                    limparFormulario();
                     
                     setTimeout(() => {
                         fecharModal();
-                        location.reload();
+                        if (typeof window.recarregarTabela === 'function') {
+                            window.recarregarTabela();
+                        } else {
+                            location.reload();
+                        }
                     }, 2000);
                 } else {
-                    mostraAlerta(data.message || 'Erro ao cadastrar EPI', 'danger');
+                    const erro = data.message || 'Erro ao cadastrar EPI';
+                    mostraAlerta(erro, 'danger');
                 }
             } catch (error) {
                 console.error('Erro:', error);
-                mostraAlerta('Erro ao processar requisição.', 'danger');
+                mostraAlerta('Erro ao processar requisição. Tente novamente.', 'danger');
             } finally {
                 loadingSpinner.classList.remove('active');
             }
@@ -585,33 +611,42 @@
         // Atualizar EPI
         async function atualizarEPI() {
             const id = document.getElementById('epiId').value;
-            const form = document.getElementById('cadastroForm');
-            const formData = new FormData(form);
-            const loadingSpinner = document.getElementById('loadingSpinner');
+            if (!id) {
+                mostraAlerta('ID do EPI não encontrado', 'danger');
+                return;
+            }
 
+            const loadingSpinner = document.getElementById('loadingSpinner');
             loadingSpinner.classList.add('active');
 
             try {
+                const dadosEPI = obterDadosFormulario();
+
                 const response = await fetch(`/api/epis/${id}`, {
                     method: 'PUT',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                         'Accept': 'application/json',
+                        'Content-Type': 'application/json',
                     },
-                    body: formData
+                    body: JSON.stringify(dadosEPI)
                 });
 
                 const data = await response.json();
 
-                if (response.ok) {
+                if (data.success) {
                     mostraAlerta('EPI atualizado com sucesso!', 'success');
                     
                     setTimeout(() => {
                         fecharModal();
-                        location.reload();
+                        if (typeof window.recarregarTabela === 'function') {
+                            window.recarregarTabela();
+                        } else {
+                            location.reload();
+                        }
                     }, 2000);
                 } else {
-                    mostraAlerta(data.message || 'Erro ao atualizar', 'danger');
+                    mostraAlerta(data.message || 'Erro ao atualizar EPI', 'danger');
                 }
             } catch (error) {
                 console.error('Erro:', error);
@@ -623,32 +658,76 @@
 
         // Deletar EPI
         async function deletarEPI(id) {
-            if (confirm('Tem certeza que deseja deletar este EPI?')) {
-                try {
-                    const response = await fetch(`/api/epis/${id}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                            'Accept': 'application/json',
-                        }
-                    });
-
-                    const data = await response.json();
-                    
-                    if (data.success) {
-                        mostraAlerta(data.message, 'success');
-                        setTimeout(() => location.reload(), 1500);
-                    } else {
-                        mostraAlerta(data.message || 'Erro ao deletar', 'danger');
+            if (!confirm('Tem certeza que deseja deletar este EPI?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/epis/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
                     }
-                } catch (error) {
-                    console.error('Erro:', error);
-                    mostraAlerta('Erro ao deletar EPI', 'danger');
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    mostraAlerta(data.message, 'success');
+                    setTimeout(() => {
+                        if (typeof window.recarregarTabela === 'function') {
+                            window.recarregarTabela();
+                        } else {
+                            location.reload();
+                        }
+                    }, 1500);
+                } else {
+                    mostraAlerta(data.message || 'Erro ao deletar EPI', 'danger');
                 }
+            } catch (error) {
+                console.error('Erro:', error);
+                mostraAlerta('Erro ao deletar EPI', 'danger');
             }
         }
 
-        // Fechar modal ao clicar fora
+        // Carregar funcionários no select
+        async function carregarFuncionarios() {
+            try {
+                const response = await fetch('/api/funcionarios', {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const funcionarios = await response.json();
+                const select = document.getElementById('funcionario_id');
+                
+                // Limpar options atuais
+                select.innerHTML = '<option value="">Não atribuído</option>';
+                
+                // Verificar se é array ou objeto com dados
+                const listaFuncionarios = Array.isArray(funcionarios) ? funcionarios : funcionarios.data || [];
+                
+                listaFuncionarios.forEach(funcionario => {
+                    const option = document.createElement('option');
+                    option.value = funcionario.id;
+                    option.textContent = `${funcionario.nome} - ${funcionario.departamento || 'Sem depto'}`;
+                    select.appendChild(option);
+                });
+                
+            } catch (error) {
+                console.error('Erro ao carregar funcionários:', error);
+                // Não mostrar alerta aqui para não interferir no fluxo
+            }
+        }
+
+        // Eventos de fechamento do modal
         document.addEventListener('click', function(event) {
             const modal = document.getElementById('cadastroModal');
             if (event.target === modal) {
@@ -656,12 +735,17 @@
             }
         });
 
-        // Fechar modal com Escape
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
                 fecharModal();
             }
         });
+
+        // Expor função globalmente para uso em outras páginas
+        window.editarEPI = editarEPI;
+        window.deletarEPI = deletarEPI;
+        window.abrirModal = abrirModal;
+        window.fecharModal = fecharModal;
     </script>
 </body>
 </html>

@@ -26,6 +26,9 @@ class DatabaseSeeder extends Seeder
             FuncionarioSeeder::class,
             EpiSeeder::class,
         ]);
-        
+
+        $this->call([
+            TiposEpiSeeder::class, // Adicionada linha para chamar o seeder TiposEpiSeeder
+        ]);
     }
 }
