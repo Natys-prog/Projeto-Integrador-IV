@@ -122,6 +122,7 @@
         <table id="epis-table" style="display: none; width: 100%; border-collapse: collapse;">
             <thead>
                 <tr style="background: #f7fafc; border-bottom: 2px solid #e2e8f0;">
+                    <th style="padding: 1rem; text-align: center; font-weight: 600; color: #4a5568; font-size: 0.875rem; width: 80px;">ID</th>
                     <th style="padding: 1rem; text-align: left; font-weight: 600; color: #4a5568; font-size: 0.875rem;">EPI</th>
                     <th style="padding: 1rem; text-align: left; font-weight: 600; color: #4a5568; font-size: 0.875rem;">Tipo</th>
                     <th style="padding: 1rem; text-align: left; font-weight: 600; color: #4a5568; font-size: 0.875rem;">Código</th>
@@ -654,11 +655,11 @@ function renderEpisTable() {
 function createEpiRow(epi) {
     const tr = document.createElement('tr');
     tr.innerHTML = `
+        <td style="text-align: center;">
+            <div style="font-size: 0.875rem; color: #718096; font-family: monospace; font-weight: 600;">#${epi.id}</div>
+        </td>
         <td>
-            <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <div style="font-weight: 600; color: #2d3748;">${epi.nome}</div>
-                <div style="font-size: 0.75rem; color: #718096; font-family: monospace; background: #edf2f7; padding: 0.25rem 0.5rem; border-radius: 4px;">#${epi.id}</div>
-            </div>
+            <div style="font-weight: 600; color: #2d3748;">${epi.nome}</div>
         </td>
         <td>
             <div class="type-badge" style="color: ${getTipoEpiById(epi.tipo_epi_id)?.cor || '#718096'};">

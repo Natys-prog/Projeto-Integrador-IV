@@ -240,6 +240,78 @@
             display: block;
         }
 
+        /* Toast Notifications - Centralized */
+        .toast-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            display: none;
+            width: 85%;
+            max-width: 320px;
+        }
+
+        .toast-container.active {
+            display: block;
+        }
+
+        .toast {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            font-size: 0.95rem;
+            font-weight: 600;
+            animation: toastSlideIn 0.3s ease-out;
+            backdrop-filter: blur(10px);
+            border: 2px solid;
+            cursor: pointer;
+            transition: box-shadow 0.2s ease, opacity 0.2s ease;
+        }
+
+        .toast:hover {
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+            opacity: 0.95;
+        }
+
+        .toast-success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border-color: #1e7e34;
+        }
+
+        .toast-danger {
+            background: linear-gradient(135deg, #dc3545, #e74c3c);
+            color: white;
+            border-color: #bd2130;
+        }
+
+        .toast-warning {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            color: #212529;
+            border-color: #d39e00;
+        }
+
+        @keyframes toastSlideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -80%);
+                scale: 0.8;
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+                scale: 1;
+            }
+        }
+
+        .toast-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.3rem;
+            display: block;
+        }
+
         /* Responsive */
         @media (max-width: 600px) {
             .modal-container {
@@ -273,13 +345,24 @@
     </style>
 </head>
 <body>
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toast-container">
+        <div class="toast" id="toast-message" title="Clique para fechar">
+            <span class="toast-icon" id="toast-icon"></span>
+            <div id="toast-text"></div>
+            <small style="opacity: 0.6; font-size: 0.7rem; margin-top: 0.3rem; display: block; font-weight: 400;">
+                Clique para fechar
+            </small>
+        </div>
+    </div>
+
     <!-- Modal -->
-    <div class="modal modal-overlay" id="epi-modal" onclick="handleModalClick(event)">
+    <div class="modal modal-overlay" id="epi-modal">
         <div class="modal-container modal-content" onclick="event.stopPropagation()">
             <!-- Header -->
             <div class="modal-header">
                 <h2 id="modal-title">📋 Novo EPI</h2>
-                <button type="button" class="close-btn" onclick="closeModal()" title="Fechar">&times;</button>
+                <button type="button" class="close-btn" onclick="fecharModal()" title="Fechar">&times;</button>
             </div>
 
             <!-- Body -->
@@ -407,12 +490,12 @@
 
             <!-- Footer -->
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeModal()">
+                <button type="button" class="btn btn-secondary" onclick="fecharModal()">
                     ✕ Cancelar
                 </button>
                 <button type="button" class="btn btn-primary" id="submit-btn" onclick="handleFormSubmission()">
                     <span id="submit-text">💾 Salvar EPI</span>
-                    <div id="submit-spinner" class="btn-spinner" style="display: none;"></div>
+                    <div id="submit-spinner" class="loading-spinner" style="display: none;"></div>
                 </button>
             </div>
         </div>
@@ -424,18 +507,26 @@
         // Abrir Modal para novo EPI
         function abrirModal() {
             modoEdicao = false;
-            document.getElementById('modalTitle').textContent = '📋 Novo EPI';
-            document.getElementById('btnText').textContent = '💾 Salvar';
+            document.getElementById('modal-title').textContent = '📋 Novo EPI';
+            document.getElementById('submit-text').textContent = '💾 Salvar EPI';
             document.getElementById('epiId').value = '';
             limparFormulario();
-            document.getElementById('cadastroModal').classList.add('active');
+            document.getElementById('epi-modal').classList.add('active');
             document.body.style.overflow = 'hidden';
+            carregarTiposEpi(); // Carregar tipos de EPI ao abrir modal
             carregarFuncionarios(); // Carregar funcionários ao abrir modal
         }
 
         // Fechar Modal
         function fecharModal() {
-            document.getElementById('cadastroModal').classList.remove('active');
+            console.log('fecharModal chamada');
+            const modal = document.getElementById('epi-modal');
+            if (modal) {
+                modal.classList.remove('active');
+                console.log('Modal fechado');
+            } else {
+                console.error('Modal não encontrado');
+            }
             document.body.style.overflow = 'auto';
             limparFormulario();
             modoEdicao = false;
@@ -443,7 +534,7 @@
 
         // Limpar Formulário
         function limparFormulario() {
-            document.getElementById('cadastroForm').reset();
+            document.getElementById('epi-form').reset();
             const alerts = ['successAlert', 'errorAlert', 'warningAlert'];
             alerts.forEach(alertId => {
                 const alert = document.getElementById(alertId);
@@ -451,8 +542,49 @@
             });
         }
 
-        // Mostrar Alertas
+        // Mostrar Alertas (Toast Centralizado)
         function mostraAlerta(mensagem, tipo) {
+            const toastContainer = document.getElementById('toast-container');
+            const toastMessage = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+            const toastText = document.getElementById('toast-text');
+            
+            // Definir ícone e classes baseado no tipo
+            let icon = '';
+            let classes = 'toast ';
+            
+            switch(tipo) {
+                case 'success':
+                    icon = '✅';
+                    classes += 'toast-success';
+                    break;
+                case 'danger':
+                    icon = '❌';
+                    classes += 'toast-danger';
+                    break;
+                case 'warning':
+                    icon = '⚠️';
+                    classes += 'toast-warning';
+                    break;
+                default:
+                    icon = 'ℹ️';
+                    classes += 'toast-info';
+            }
+            
+            // Configurar o toast
+            toastIcon.textContent = icon;
+            toastText.textContent = mensagem;
+            toastMessage.className = classes;
+            
+            // Mostrar o toast
+            toastContainer.classList.add('active');
+            
+            // Esconder automaticamente após 4 segundos
+            setTimeout(() => {
+                toastContainer.classList.remove('active');
+            }, 4000);
+            
+            // Também mostrar o alerta no modal (para compatibilidade)
             const alertId = `${tipo}Alert`;
             const alertElement = document.getElementById(alertId);
             
@@ -468,7 +600,7 @@
 
         // Enviar Formulário
         function enviarFormulario() {
-            const form = document.getElementById('cadastroForm');
+            const form = document.getElementById('epi-form');
             if (!form.checkValidity()) {
                 mostraAlerta('Por favor, preencha todos os campos obrigatórios.', 'warning');
                 form.reportValidity();
@@ -505,13 +637,14 @@
                     const epi = data.data;
                     console.log('EPI encontrado:', epi);
                     
-                    // Aguardar funcionários carregarem antes de preencher
+                    // Aguardar tipos e funcionários carregarem antes de preencher
+                    await carregarTiposEpi();
                     await carregarFuncionarios();
                     
                     // Preencher formulário
                     document.getElementById('epiId').value = epi.id;
                     document.getElementById('nome').value = epi.nome || '';
-                    document.getElementById('tipo').value = epi.tipo || '';
+                    document.getElementById('tipo_epi_id').value = epi.tipo_epi_id || '';
                     document.getElementById('codigo').value = epi.codigo || '';
                     document.getElementById('status').value = epi.status || 'ativo';
                     document.getElementById('fabricante').value = epi.fabricante || '';
@@ -523,10 +656,10 @@
                     
                     // Trocar para modo edição
                     modoEdicao = true;
-                    document.getElementById('modalTitle').textContent = '✏️ Editar EPI';
-                    document.getElementById('btnText').textContent = '🔄 Atualizar';
+                    document.getElementById('modal-title').textContent = '✏️ Editar EPI';
+                    document.getElementById('submit-text').textContent = '🔄 Atualizar EPI';
                     
-                    document.getElementById('cadastroModal').classList.add('active');
+                    document.getElementById('epi-modal').classList.add('active');
                     document.body.style.overflow = 'hidden';
                 } else {
                     mostraAlerta(data.message || 'EPI não encontrado', 'danger');
@@ -596,7 +729,7 @@
                         } else {
                             location.reload();
                         }
-                    }, 2000);
+                    }, 1500);
                 } else {
                     const erro = data.message || 'Erro ao cadastrar EPI';
                     mostraAlerta(erro, 'danger');
@@ -659,7 +792,7 @@
                         } else {
                             location.reload();
                         }
-                    }, 2000);
+                    }, 1500);
                 } else {
                     // Remover loading
                     submitBtn.disabled = false;
@@ -705,13 +838,49 @@
                         } else {
                             location.reload();
                         }
-                    }, 1500);
+                    }, 1000);
                 } else {
                     mostraAlerta(data.message || 'Erro ao deletar EPI', 'danger');
                 }
             } catch (error) {
                 console.error('Erro:', error);
                 mostraAlerta('Erro ao deletar EPI', 'danger');
+            }
+        }
+
+        // Carregar tipos de EPI no select
+        async function carregarTiposEpi() {
+            try {
+                const response = await fetch('/api/tipos-epi', {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const tipos = await response.json();
+                const select = document.getElementById('tipo_epi_id');
+                
+                // Limpar options atuais
+                select.innerHTML = '<option value="">Selecione o tipo</option>';
+                
+                // Verificar se é array ou objeto com dados
+                const listaTipos = Array.isArray(tipos) ? tipos : tipos.data || [];
+                
+                listaTipos.forEach(tipo => {
+                    const option = document.createElement('option');
+                    option.value = tipo.id;
+                    option.textContent = tipo.nome;
+                    select.appendChild(option);
+                });
+                
+            } catch (error) {
+                console.error('Erro ao carregar tipos de EPI:', error);
+                // Não mostrar alerta aqui para não interferir no fluxo
             }
         }
 
@@ -751,9 +920,15 @@
             }
         }
 
+        // Fechar toast ao clicar nele
+        function fecharToast() {
+            const toastContainer = document.getElementById('toast-container');
+            toastContainer.classList.remove('active');
+        }
+
         // Eventos de fechamento do modal
         document.addEventListener('click', function(event) {
-            const modal = document.getElementById('cadastroModal');
+            const modal = document.getElementById('epi-modal');
             if (event.target === modal) {
                 fecharModal();
             }
@@ -792,6 +967,12 @@
                     handleFormSubmission();
                 });
             }
+
+            // Event listener para fechar toast ao clicar
+            const toastContainer = document.getElementById('toast-container');
+            if (toastContainer) {
+                toastContainer.addEventListener('click', fecharToast);
+            }
         });
 
         // Expor função globalmente para uso em outras páginas
@@ -800,6 +981,9 @@
         window.abrirModal = abrirModal;
         window.fecharModal = fecharModal;
         window.handleFormSubmission = handleFormSubmission;
+        window.carregarTiposEpi = carregarTiposEpi;
+        window.mostraAlerta = mostraAlerta;
+        window.fecharToast = fecharToast;
     </script>
 </body>
 </html>
