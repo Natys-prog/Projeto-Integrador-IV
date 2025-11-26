@@ -22,7 +22,7 @@ return new class extends Migration
             
             $table->text('descricao')->nullable();
             $table->string('codigo')->unique();
-            $table->date('data_aquisicao');
+            $table->date('data_aquisicao')->default(DB::raw('CURRENT_DATE'));
             $table->date('data_vencimento')->nullable();
             $table->enum('status', ['ativo', 'inativo', 'manutencao', 'descartado'])->default('ativo');
             $table->string('fabricante')->nullable();

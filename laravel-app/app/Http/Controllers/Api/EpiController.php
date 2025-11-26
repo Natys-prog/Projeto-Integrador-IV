@@ -140,6 +140,8 @@ class EpiController extends Controller
     public function store(Request $request)
     {
         try {
+            \Log::info('EPI Store Request Data:', $request->all());
+            
             $validated = $request->validate([
                 'nome' => 'required|string|max:255',
                 'tipo_epi_id' => 'required|exists:tipos_epi,id',
@@ -153,15 +155,12 @@ class EpiController extends Controller
                 'descricao' => 'nullable|string',
             ]);
 
+            \Log::info('EPI Validated Data:', $validated);
+
             $validated['status'] = $validated['status'] ?? 'ativo';
+            $validated['data_aquisicao'] = $validated['data_aquisicao'] ?? now()->format('Y-m-d');
             
-            // Temporary fix: provide a value for the old 'tipo' column until migration is complete
-            if (isset($validated['tipo_epi_id'])) {
-                $tipoEpi = \App\Models\TipoEpi::find($validated['tipo_epi_id']);
-                if ($tipoEpi) {
-                    $validated['tipo'] = $tipoEpi->codigo;
-                }
-            }
+            \Log::info('EPI Final Data to Create:', $validated);
             
             $epi = Epi::create($validated);
             $epi->load(['tipoEpi', 'funcionario']);
@@ -173,15 +172,17 @@ class EpiController extends Controller
             ], 201);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('EPI Validation Error:', $e->errors());
             return response()->json([
                 'success' => false,
                 'message' => 'Dados inválidos',
                 'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
+            \Log::error('EPI Store Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json([
                 'success' => false,
-                'message' => 'Erro interno do servidor'
+                'message' => 'Erro interno do servidor: ' . $e->getMessage()
             ], 500);
         }
     }

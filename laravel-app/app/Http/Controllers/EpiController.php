@@ -60,7 +60,7 @@ class EpiController extends Controller
     {
         $validated = $request->validate([
             'nome' => 'required|string|max:255',
-            'tipo' => 'required|string|in:capacete,oculos,luvas,botas,cinto_seguranca,mascara,protetor_auditivo,colete_refletivo,outros',
+            'tipo' => 'nullable|string',
             'codigo' => 'required|string|unique:epis,codigo',
             'status' => 'nullable|string|in:ativo,inativo,manutencao,descartado',
             'fabricante' => 'nullable|string|max:255',
@@ -72,6 +72,7 @@ class EpiController extends Controller
         ]);
 
         $validated['status'] = $validated['status'] ?? 'ativo';
+        $validated['data_aquisicao'] = $validated['data_aquisicao'] ?? now()->format('Y-m-d');
 
         $epi = Epi::create($validated);
 
