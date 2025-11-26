@@ -17,8 +17,8 @@ class EpiController extends Controller
             $query->where('status', $request->status);
         }
 
-        if ($request->has('tipo') && $request->tipo != '') {
-            $query->where('tipo', $request->tipo);
+        if ($request->has('tipo_epi_id') && $request->tipo_epi_id != '') {
+            $query->where('tipo_epi_id', $request->tipo_epi_id);
         }
 
         if ($request->has('search') && $request->search != '') {
@@ -44,7 +44,7 @@ class EpiController extends Controller
 
         return view('epi', [
             'epis' => $epis,
-            'filters' => $request->only(['status', 'tipo', 'search', 'order_by', 'order_direction']),
+            'filters' => $request->only(['status', 'tipo_epi_id', 'search', 'order_by', 'order_direction']),
             'serverTime' => date('Y-m-d H:i:s')
         ]);
     }
@@ -60,7 +60,7 @@ class EpiController extends Controller
     {
         $validated = $request->validate([
             'nome' => 'required|string|max:255',
-            'tipo' => 'nullable|string',
+            'tipo_epi_id' => 'required|exists:tipos_epi,id',
             'codigo' => 'required|string|unique:epis,codigo',
             'status' => 'nullable|string|in:ativo,inativo,manutencao,descartado',
             'fabricante' => 'nullable|string|max:255',
@@ -113,7 +113,7 @@ class EpiController extends Controller
 
         $validated = $request->validate([
             'nome' => 'required|string|max:255',
-            'tipo' => 'required|string|in:capacete,oculos,luvas,botas,cinto_seguranca,mascara,protetor_auditivo,colete_refletivo,outros',
+            'tipo_epi_id' => 'required|exists:tipos_epi,id',
             'codigo' => 'required|string|unique:epis,codigo,' . $id,
             'status' => 'nullable|string|in:ativo,inativo,manutencao,descartado',
             'fabricante' => 'nullable|string|max:255',

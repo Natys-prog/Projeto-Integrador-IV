@@ -140,8 +140,6 @@ class EpiController extends Controller
     public function store(Request $request)
     {
         try {
-            \Log::info('EPI Store Request Data:', $request->all());
-            
             $validated = $request->validate([
                 'nome' => 'required|string|max:255',
                 'tipo_epi_id' => 'required|exists:tipos_epi,id',
@@ -155,12 +153,8 @@ class EpiController extends Controller
                 'descricao' => 'nullable|string',
             ]);
 
-            \Log::info('EPI Validated Data:', $validated);
-
             $validated['status'] = $validated['status'] ?? 'ativo';
             $validated['data_aquisicao'] = $validated['data_aquisicao'] ?? now()->format('Y-m-d');
-            
-            \Log::info('EPI Final Data to Create:', $validated);
             
             $epi = Epi::create($validated);
             $epi->load(['tipoEpi', 'funcionario']);
@@ -172,17 +166,16 @@ class EpiController extends Controller
             ], 201);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
-            \Log::error('EPI Validation Error:', $e->errors());
             return response()->json([
                 'success' => false,
                 'message' => 'Dados inválidos',
                 'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
-            \Log::error('EPI Store Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            \Log::error('Erro ao criar EPI: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Erro interno do servidor: ' . $e->getMessage()
+                'message' => 'Erro interno do servidor'
             ], 500);
         }
     }
@@ -218,7 +211,7 @@ class EpiController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'EPI atualizado com sucesso!',
-                'data' => $epi->load('funcionario')
+                'data' => $epi->load(['funcionario', 'tipoEpi'])
             ]);
 
         } catch (\Illuminate\Validation\ValidationException $e) {

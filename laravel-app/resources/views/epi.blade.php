@@ -11,9 +11,14 @@
         </h1>
         <p style="color: #7f8c8d; margin: 0.5rem 0 0 0;">Controle completo dos Equipamentos de Proteção Individual</p>
     </div>
-    <button class="btn-primary" onclick="openModal('create')" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">
-        ➕ Novo EPI
-    </button>
+    <div style="display: flex; gap: 1rem;">
+        <button class="btn-primary" onclick="openModal('create')" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">
+            ➕ Novo EPI
+        </button>
+        <button onclick="testDirectSubmit()" style="background: #f39c12; color: white; border: none; padding: 0.75rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.8rem;">
+            🧪 Teste API
+        </button>
+    </div>
 </div>
 
 <!-- Statistics Cards -->
@@ -301,6 +306,100 @@
             opacity: 1;
         }
     }
+
+    /* Notification Styles */
+    #notifications-container {
+        position: fixed;
+        top: 90px;
+        right: 20px;
+        z-index: 3000;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        max-width: 400px;
+    }
+
+    .notification {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        padding: 1rem 1.5rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        animation: notificationSlide 0.3s ease;
+        border-left: 4px solid;
+    }
+
+    .notification.success {
+        border-left-color: #10b981;
+        background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+    }
+
+    .notification.error {
+        border-left-color: #ef4444;
+        background: linear-gradient(135deg, #fef2f2 0%, #fefefe 100%);
+    }
+
+    .notification.warning {
+        border-left-color: #f59e0b;
+        background: linear-gradient(135deg, #fffbeb 0%, #fefefe 100%);
+    }
+
+    .notification.info {
+        border-left-color: #3b82f6;
+        background: linear-gradient(135deg, #eff6ff 0%, #fefefe 100%);
+    }
+
+    .notification-content {
+        flex: 1;
+    }
+
+    .notification-title {
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+        color: #1f2937;
+    }
+
+    .notification-message {
+        font-size: 0.875rem;
+        color: #6b7280;
+        line-height: 1.4;
+    }
+
+    .notification-close {
+        background: none;
+        border: none;
+        color: #9ca3af;
+        cursor: pointer;
+        font-size: 1.25rem;
+        line-height: 1;
+        padding: 0;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.2s;
+    }
+
+    .notification-close:hover {
+        background: rgba(0, 0, 0, 0.1);
+        color: #374151;
+    }
+
+    @keyframes notificationSlide {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
 </style>
 
 <script>
@@ -342,23 +441,46 @@ async function initializeApp() {
 }
 
 function setupEventListeners() {
+    console.log('Setting up event listeners...');
+    
     // Search on Enter key
-    document.getElementById('search-input').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            applyFilters();
-        }
-    });
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                applyFilters();
+            }
+        });
+        console.log('Search input listener attached');
+    }
 
-    // Form submission
-    document.getElementById('epi-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        handleFormSubmit();
-    });
+    // Form submission - will be attached when modal opens
+    const form = document.getElementById('epi-form');
+    if (form) {
+        console.log('EPI form found, will attach listener when modal opens');
+    } else {
+        console.log('EPI form not found yet (modal not loaded)');
+    }
 
     // Auto-apply filters when changed
-    document.getElementById('status-filter').addEventListener('change', applyFilters);
-    document.getElementById('tipo-filter').addEventListener('change', applyFilters);
-    document.getElementById('order-filter').addEventListener('change', applyFilters);
+    const statusFilter = document.getElementById('status-filter');
+    const tipoFilter = document.getElementById('tipo-filter');
+    const orderFilter = document.getElementById('order-filter');
+    
+    if (statusFilter) {
+        statusFilter.addEventListener('change', applyFilters);
+        console.log('Status filter listener attached');
+    }
+    
+    if (tipoFilter) {
+        tipoFilter.addEventListener('change', applyFilters);
+        console.log('Tipo filter listener attached');
+    }
+    
+    if (orderFilter) {
+        orderFilter.addEventListener('change', applyFilters);
+        console.log('Order filter listener attached');
+    }
 
     // Close modal on Escape key
     document.addEventListener('keydown', function(e) {
@@ -367,6 +489,7 @@ function setupEventListeners() {
             closeDeleteModal();
         }
     });
+    console.log('Escape key listener attached');
 }
 
 // API Functions
@@ -385,14 +508,47 @@ async function apiRequest(url, options = {}) {
         headers: { ...defaultOptions.headers, ...options.headers },
     };
 
-    const response = await fetch(url, mergedOptions);
-    const data = await response.json();
+    console.log('Making API request:', {
+        url: url,
+        method: mergedOptions.method || 'GET',
+        headers: mergedOptions.headers,
+        body: mergedOptions.body
+    });
 
-    if (!response.ok) {
-        throw new Error(data.message || 'Erro na requisição');
+    try {
+        const response = await fetch(url, mergedOptions);
+        console.log('Response status:', response.status, response.statusText);
+        
+        let data;
+        const contentType = response.headers.get('content-type');
+        
+        if (contentType && contentType.includes('application/json')) {
+            data = await response.json();
+        } else {
+            const textData = await response.text();
+            console.error('Non-JSON response:', textData);
+            throw new Error(`Resposta inválida do servidor: ${textData.substring(0, 200)}`);
+        }
+        
+        console.log('Response data:', data);
+
+        if (!response.ok) {
+            let errorMessage = data.message || `Erro HTTP ${response.status}`;
+            
+            // Include validation errors if available
+            if (data.errors) {
+                const validationErrors = Object.values(data.errors).flat();
+                errorMessage += ': ' + validationErrors.join(', ');
+            }
+            
+            throw new Error(errorMessage);
+        }
+
+        return data;
+    } catch (error) {
+        console.error('API Request failed:', error);
+        throw error;
     }
-
-    return data;
 }
 
 async function loadEpis() {
@@ -422,6 +578,8 @@ async function loadEpis() {
 async function loadTiposEpi() {
     try {
         const response = await apiRequest(`${API_BASE}/tipos-epi`);
+        
+        // The API now returns object with data property
         tiposEpi = response.data || [];
         
         populateTiposSelect();
@@ -438,6 +596,7 @@ async function loadTiposEpi() {
             { id: 7, nome: 'Protetor Auditivo', codigo: 'protetor_auditivo', icone: '🎧', cor: '#3498DB' },
             { id: 8, nome: 'Colete Refletivo', codigo: 'colete_refletivo', icone: '🦺', cor: '#F39C12' }
         ];
+
         populateTiposSelect();
     }
 }
@@ -679,31 +838,53 @@ function updateResultsInfo() {
 function openModal(mode, epiId = null) {
     console.log('openModal called with mode:', mode, 'epiId:', epiId);
     currentEpiId = epiId;
+    
     const modal = document.getElementById('epi-modal');
     const title = document.getElementById('modal-title');
     const submitBtn = document.getElementById('submit-btn');
     const submitText = document.getElementById('submit-text');
+    const form = document.getElementById('epi-form');
 
     console.log('Modal elements found:', {
         modal: !!modal,
         title: !!title,
         submitBtn: !!submitBtn,
-        submitText: !!submitText
+        submitText: !!submitText,
+        form: !!form
     });
 
+    if (!modal) {
+        console.error('Modal not found! Check if the modal is included correctly');
+        showNotification('Erro ao abrir modal', 'error');
+        return;
+    }
+
     if (mode === 'create') {
-        title.textContent = 'Novo EPI';
-        submitText.textContent = 'Salvar EPI';
+        if (title) title.textContent = 'Novo EPI';
+        if (submitText) submitText.textContent = 'Salvar EPI';
         clearForm();
+        console.log('Modal set to CREATE mode');
     } else if (mode === 'edit' && epiId) {
-        title.textContent = 'Editar EPI';
-        submitText.textContent = 'Atualizar EPI';
+        if (title) title.textContent = 'Editar EPI';
+        if (submitText) submitText.textContent = 'Atualizar EPI';
+        console.log('Modal set to EDIT mode, loading data...');
         loadEpiData(epiId);
+    }
+
+    // Ensure form event listener is attached
+    if (form && !form.hasAttribute('data-listener-attached')) {
+        form.addEventListener('submit', function(e) {
+            console.log('Form submitted!');
+            e.preventDefault();
+            handleFormSubmit();
+        });
+        form.setAttribute('data-listener-attached', 'true');
+        console.log('Form event listener attached');
     }
 
     modal.classList.add('show');
     document.body.style.overflow = 'hidden';
-    console.log('Modal should now be visible');
+    console.log('Modal should now be visible with class:', modal.className);
 }
 
 function closeModal() {
@@ -727,8 +908,23 @@ function editEpi(id) {
 
 async function loadEpiData(id) {
     try {
+        console.log('Loading EPI data for ID:', id);
         const response = await apiRequest(`${API_BASE}/epis/${id}`);
         const epi = response.data;
+        
+        console.log('EPI data received:', epi);
+        
+        // Helper function to format date for input fields
+        function formatDateForInput(dateString) {
+            if (!dateString) return '';
+            try {
+                const date = new Date(dateString);
+                return date.toISOString().split('T')[0]; // Returns YYYY-MM-DD format
+            } catch (error) {
+                console.error('Error formatting date:', dateString, error);
+                return '';
+            }
+        }
         
         // Populate form fields
         document.getElementById('nome').value = epi.nome || '';
@@ -738,9 +934,11 @@ async function loadEpiData(id) {
         document.getElementById('lote').value = epi.lote || '';
         document.getElementById('status').value = epi.status || 'ativo';
         document.getElementById('funcionario_id').value = epi.funcionario_id || '';
-        document.getElementById('data_aquisicao').value = epi.data_aquisicao || '';
-        document.getElementById('data_vencimento').value = epi.data_vencimento || '';
+        document.getElementById('data_aquisicao').value = formatDateForInput(epi.data_aquisicao);
+        document.getElementById('data_vencimento').value = formatDateForInput(epi.data_vencimento);
         document.getElementById('descricao').value = epi.descricao || '';
+        
+        console.log('Form populated with data');
         
     } catch (error) {
         console.error('Erro ao carregar EPI:', error);
@@ -769,35 +967,60 @@ async function handleFormSubmit() {
     const formData = getFormData();
     const isEdit = currentEpiId !== null;
     
+    console.log('Form Data to submit:', formData);
+    console.log('Is Edit mode:', isEdit);
+    console.log('Current EPI ID:', currentEpiId);
+    
     try {
         setSubmitLoading(true);
         
         let response;
         if (isEdit) {
+            console.log(`Making PUT request to: ${API_BASE}/epis/${currentEpiId}`);
             response = await apiRequest(`${API_BASE}/epis/${currentEpiId}`, {
                 method: 'PUT',
                 body: JSON.stringify(formData)
             });
         } else {
+            console.log(`Making POST request to: ${API_BASE}/epis`);
             response = await apiRequest(`${API_BASE}/epis`, {
                 method: 'POST',
                 body: JSON.stringify(formData)
             });
         }
         
+        console.log('API Response:', response);
         showNotification(response.message, 'success');
         closeModal();
         await loadEpis();
         
     } catch (error) {
-        console.error('Erro ao salvar EPI:', error);
+        console.error('Detailed error information:', {
+            message: error.message,
+            stack: error.stack,
+            response: error.response,
+            isEdit: isEdit,
+            formData: formData,
+            currentEpiId: currentEpiId
+        });
         
-        if (error.message.includes('422') || error.message.includes('validation')) {
-            showNotification('Por favor, verifique os dados informados', 'error');
-            // Handle validation errors if available
-        } else {
-            showNotification('Erro ao salvar EPI. Tente novamente.', 'error');
+        // Try to extract more detailed error information
+        let errorMessage = 'Erro ao salvar EPI';
+        
+        try {
+            // Check if it's a fetch response error
+            if (error.response && typeof error.response.text === 'function') {
+                const errorText = await error.response.text();
+                console.error('Error response text:', errorText);
+                errorMessage += `: ${errorText}`;
+            } else if (error.message) {
+                errorMessage += `: ${error.message}`;
+            }
+        } catch (parseError) {
+            console.error('Error parsing error response:', parseError);
         }
+        
+        showNotification(errorMessage, 'error');
     } finally {
         setSubmitLoading(false);
     }
@@ -929,6 +1152,36 @@ function removeNotification(notification) {
         setTimeout(() => {
             notification.remove();
         }, 300);
+    }
+}
+
+// Test function for debugging
+async function testDirectSubmit() {
+    console.log('Testing direct API submission...');
+    
+    const testData = {
+        nome: 'Teste Direct ' + new Date().getTime(),
+        tipo_epi_id: 1,
+        codigo: 'DIR' + new Date().getTime(),
+        status: 'ativo',
+        data_aquisicao: new Date().toISOString().split('T')[0]
+    };
+    
+    console.log('Test data:', testData);
+    
+    try {
+        const response = await apiRequest(`${API_BASE}/epis`, {
+            method: 'POST',
+            body: JSON.stringify(testData)
+        });
+        
+        console.log('Test successful:', response);
+        showNotification('Teste API funcionou! ' + response.message, 'success');
+        await loadEpis();
+        
+    } catch (error) {
+        console.error('Test failed:', error);
+        showNotification('Teste API falhou: ' + error.message, 'error');
     }
 }
 </script>

@@ -36,16 +36,26 @@ Route::prefix('funcionarios')->group(function () {
 
 // API para listar funcionários (para uso nos selects)
 Route::get('/funcionarios', function () {
-    return Funcionario::where('status', 'ativo')
-                     ->select('id', 'nome', 'departamento')
-                     ->orderBy('nome')
-                     ->get();
+    $funcionarios = Funcionario::where('status', 'ativo')
+                              ->select('id', 'nome', 'departamento')
+                              ->orderBy('nome')
+                              ->get();
+    
+    return response()->json([
+        'success' => true,
+        'data' => $funcionarios
+    ]);
 });
 
 // API para listar tipos de EPI
 Route::get('/tipos-epi', function () {
-    return TipoEpi::ativos()
-                  ->select('id', 'nome', 'codigo', 'icone', 'cor')
-                  ->orderBy('nome')
-                  ->get();
+    $tipos = TipoEpi::ativos()
+                    ->select('id', 'nome', 'codigo', 'icone', 'cor')
+                    ->orderBy('nome')
+                    ->get();
+    
+    return response()->json([
+        'success' => true,
+        'data' => $tipos
+    ]);
 });

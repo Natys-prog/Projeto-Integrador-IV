@@ -410,7 +410,7 @@
                 <button type="button" class="btn btn-secondary" onclick="closeModal()">
                     ✕ Cancelar
                 </button>
-                <button type="submit" class="btn btn-primary" id="submit-btn">
+                <button type="button" class="btn btn-primary" id="submit-btn" onclick="handleFormSubmission()">
                     <span id="submit-text">💾 Salvar EPI</span>
                     <div id="submit-spinner" class="btn-spinner" style="display: none;"></div>
                 </button>
@@ -539,12 +539,12 @@
 
         // Criar objeto com dados do formulário
         function obterDadosFormulario() {
-            const form = document.getElementById('cadastroForm');
+            const form = document.getElementById('epi-form');
             const formData = new FormData(form);
             
-            return {
+            const data = {
                 nome: formData.get('nome'),
-                tipo: formData.get('tipo'),
+                tipo_epi_id: formData.get('tipo_epi_id'), // Corrigido para usar tipo_epi_id
                 codigo: formData.get('codigo'),
                 status: formData.get('status') || 'ativo',
                 fabricante: formData.get('fabricante'),
@@ -554,12 +554,21 @@
                 data_vencimento: formData.get('data_vencimento') || null,
                 descricao: formData.get('descricao'),
             };
+            
+            console.log('Dados do formulário:', data);
+            return data;
         }
 
         // Salvar novo EPI
         async function salvarEPI() {
-            const loadingSpinner = document.getElementById('loadingSpinner');
-            loadingSpinner.classList.add('active');
+            const submitBtn = document.getElementById('submit-btn');
+            const submitText = document.getElementById('submit-text');
+            const submitSpinner = document.getElementById('submit-spinner');
+            
+            // Mostrar loading
+            submitBtn.disabled = true;
+            submitText.style.display = 'none';
+            submitSpinner.style.display = 'block';
 
             try {
                 const dadosEPI = obterDadosFormulario();
@@ -596,7 +605,10 @@
                 console.error('Erro:', error);
                 mostraAlerta('Erro ao processar requisição. Tente novamente.', 'danger');
             } finally {
-                loadingSpinner.classList.remove('active');
+                // Esconder loading
+                submitBtn.disabled = false;
+                submitText.style.display = 'block';
+                submitSpinner.style.display = 'none';
             }
         }
 
@@ -608,8 +620,14 @@
                 return;
             }
 
-            const loadingSpinner = document.getElementById('loadingSpinner');
-            loadingSpinner.classList.add('active');
+            const submitBtn = document.getElementById('submit-btn');
+            const submitText = document.getElementById('submit-text');
+            const submitSpinner = document.getElementById('submit-spinner');
+            
+            // Mostrar loading
+            submitBtn.disabled = true;
+            submitText.style.display = 'none';
+            submitSpinner.style.display = 'block';
 
             try {
                 const dadosEPI = obterDadosFormulario();
@@ -630,6 +648,11 @@
                     mostraAlerta('EPI atualizado com sucesso!', 'success');
                     
                     setTimeout(() => {
+                        // Remover loading
+                        submitBtn.disabled = false;
+                        submitText.style.display = 'block';
+                        submitSpinner.style.display = 'none';
+                        
                         fecharModal();
                         if (typeof window.recarregarTabela === 'function') {
                             window.recarregarTabela();
@@ -638,13 +661,22 @@
                         }
                     }, 2000);
                 } else {
+                    // Remover loading
+                    submitBtn.disabled = false;
+                    submitText.style.display = 'block';
+                    submitSpinner.style.display = 'none';
+                    
                     mostraAlerta(data.message || 'Erro ao atualizar EPI', 'danger');
                 }
             } catch (error) {
                 console.error('Erro:', error);
+                
+                // Remover loading
+                submitBtn.disabled = false;
+                submitText.style.display = 'block';
+                submitSpinner.style.display = 'none';
+                
                 mostraAlerta('Erro ao processar requisição.', 'danger');
-            } finally {
-                loadingSpinner.classList.remove('active');
             }
         }
 
@@ -733,11 +765,41 @@
             }
         });
 
+        // Função para lidar com o envio do formulário
+        function handleFormSubmission() {
+            console.log('handleFormSubmission called, modo edição:', modoEdicao);
+            
+            const form = document.getElementById('epi-form');
+            if (!form.checkValidity()) {
+                mostraAlerta('Por favor, preencha todos os campos obrigatórios.', 'warning');
+                form.reportValidity();
+                return;
+            }
+
+            if (modoEdicao) {
+                atualizarEPI();
+            } else {
+                salvarEPI();
+            }
+        }
+
+        // Adicionar event listener para o formulário
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('epi-form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    handleFormSubmission();
+                });
+            }
+        });
+
         // Expor função globalmente para uso em outras páginas
         window.editarEPI = editarEPI;
         window.deletarEPI = deletarEPI;
         window.abrirModal = abrirModal;
         window.fecharModal = fecharModal;
+        window.handleFormSubmission = handleFormSubmission;
     </script>
 </body>
 </html>
