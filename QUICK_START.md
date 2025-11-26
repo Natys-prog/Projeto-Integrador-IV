@@ -1,18 +1,6 @@
 # 🚀 Quick Start Guide
 
-## One-Command Setup
-
 Choose your preferred method:
-
-### 🐧 Linux/Mac (Recommended)
-```bash
-./setup.sh
-```
-
-### 🪟 Windows
-```batch
-setup.bat
-```
 
 ### 📦 Using npm
 ```bash
@@ -38,8 +26,6 @@ cd laravel-app && composer setup
    ```
 
 2. **Visit your app:** http://127.0.0.1:8000
-
-3. **Initialize database:** http://127.0.0.1:8000/init-db
 
 ## What the Setup Does
 

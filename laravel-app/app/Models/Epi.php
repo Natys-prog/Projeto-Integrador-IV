@@ -14,6 +14,7 @@ class Epi extends Model
     
     protected $fillable = [
         'nome',
+        'tipo', // Keep old column temporarily for backwards compatibility
         'tipo_epi_id', // Mudança: agora é FK para tipos_epi
         'codigo',
         'status',

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\EpiController;
+use App\Http\Controllers\Api\FuncionarioController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 

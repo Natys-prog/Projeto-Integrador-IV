@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPI Management Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        h1 {
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .test-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .test-card h2 {
+            color: #4a5568;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 5px;
+            transition: all 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        button:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ccc;
+            background: #f7fafc;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .result.success {
+            border-left-color: #48bb78;
+            background: #f0fff4;
+        }
+        .result.error {
+            border-left-color: #f56565;
+            background: #fff5f5;
+        }
+        .result pre {
+            margin: 0;
+            white-space: pre-wrap;
+            font-size: 12px;
+        }
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        .stat {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-width: 100px;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #718096;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🦺 EPI Management System - API Test</h1>
+    
+    <div class="full-width stats" id="stats-container" style="display: none;">
+        <div class="stat">
+            <div class="stat-number" id="total-stat">0</div>
+            <div class="stat-label">Total EPIs</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number" id="active-stat">0</div>
+            <div class="stat-label">Ativos</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number" id="maintenance-stat">0</div>
+            <div class="stat-label">Manutenção</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number" id="expired-stat">0</div>
+            <div class="stat-label">Vencidos</div>
+        </div>
+    </div>
+
+    <div class="test-grid">
+        <div class="test-card">
+            <h2>📋 Tipos de EPI</h2>
+            <button onclick="testTiposEPI()">Testar Endpoint</button>
+            <div id="tipos-result" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-card">
+            <h2>👥 Funcionários</h2>
+            <button onclick="testFuncionarios()">Testar Endpoint</button>
+            <div id="funcionarios-result" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-card">
+            <h2>🦺 EPIs</h2>
+            <button onclick="testEPIs()">Testar Endpoint</button>
+            <div id="epis-result" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-card">
+            <h2>🔍 Busca com Filtros</h2>
+            <button onclick="testEPIsWithFilters()">Testar Filtros</button>
+            <div id="filters-result" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-card full-width">
+            <h2>🧪 Teste Completo</h2>
+            <button onclick="runAllTests()" id="all-tests-btn">Executar Todos os Testes</button>
+            <button onclick="clearAllResults()">Limpar Resultados</button>
+            <div id="summary-result" class="result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        let testResults = [];
+
+        async function apiRequest(url) {
+            try {
+                console.log(`Testing endpoint: ${url}`);
+                const response = await fetch(url, {
+                    headers: {
+                        'Accept': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                
+                return {
+                    success: response.ok,
+                    status: response.status,
+                    data: data
+                };
+            } catch (error) {
+                return {
+                    success: false,
+                    status: 0,
+                    error: error.message
+                };
+            }
+        }
+
+        function showResult(resultId, result, url) {
+            const element = document.getElementById(resultId);
+            element.style.display = 'block';
+            element.className = `result ${result.success ? 'success' : 'error'}`;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            
+            if (result.success) {
+                element.innerHTML = `
+                    <strong>✅ Sucesso (${result.status})</strong> - ${timestamp}<br>
+                    <strong>URL:</strong> ${url}<br>
+                    <strong>Dados:</strong> ${result.data.data ? result.data.data.length + ' itens' : 'objeto'}<br>
+                    <pre>${JSON.stringify(result.data, null, 2)}</pre>
+                `;
+            } else {
+                element.innerHTML = `
+                    <strong>❌ Erro (${result.status})</strong> - ${timestamp}<br>
+                    <strong>URL:</strong> ${url}<br>
+                    <strong>Erro:</strong> ${result.error || 'Falha na requisição'}<br>
+                    ${result.data ? '<pre>' + JSON.stringify(result.data, null, 2) + '</pre>' : ''}
+                `;
+            }
+        }
+
+        async function testTiposEPI() {
+            const result = await apiRequest('/api/tipos-epi');
+            showResult('tipos-result', result, '/api/tipos-epi');
+            testResults.push({ name: 'Tipos de EPI', result });
+        }
+
+        async function testFuncionarios() {
+            const result = await apiRequest('/api/funcionarios');
+            showResult('funcionarios-result', result, '/api/funcionarios');
+            testResults.push({ name: 'Funcionários', result });
+        }
+
+        async function testEPIs() {
+            const result = await apiRequest('/api/epis');
+            showResult('epis-result', result, '/api/epis');
+            testResults.push({ name: 'EPIs', result });
+            
+            // Update stats if successful
+            if (result.success && result.data.statistics) {
+                updateStats(result.data.statistics);
+            }
+        }
+
+        async function testEPIsWithFilters() {
+            const result = await apiRequest('/api/epis?status=ativo&order_by=nome');
+            showResult('filters-result', result, '/api/epis?status=ativo&order_by=nome');
+            testResults.push({ name: 'EPIs com Filtros', result });
+        }
+
+        function updateStats(stats) {
+            document.getElementById('stats-container').style.display = 'flex';
+            document.getElementById('total-stat').textContent = stats.total || 0;
+            document.getElementById('active-stat').textContent = stats.ativo || 0;
+            document.getElementById('maintenance-stat').textContent = stats.manutencao || 0;
+            document.getElementById('expired-stat').textContent = stats.vencidos || 0;
+        }
+
+        async function runAllTests() {
+            const btn = document.getElementById('all-tests-btn');
+            btn.disabled = true;
+            btn.textContent = 'Executando Testes...';
+            
+            testResults = [];
+            
+            try {
+                await testTiposEPI();
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                await testFuncionarios();
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                await testEPIs();
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                await testEPIsWithFilters();
+                
+                showSummary();
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Executar Todos os Testes';
+            }
+        }
+
+        function showSummary() {
+            const successful = testResults.filter(t => t.result.success).length;
+            const total = testResults.length;
+            
+            const summaryElement = document.getElementById('summary-result');
+            summaryElement.style.display = 'block';
+            summaryElement.className = `result ${successful === total ? 'success' : 'error'}`;
+            
+            summaryElement.innerHTML = `
+                <h3>📊 Resumo dos Testes</h3>
+                <p><strong>Executados:</strong> ${total} testes</p>
+                <p><strong>Sucessos:</strong> ${successful}</p>
+                <p><strong>Falhas:</strong> ${total - successful}</p>
+                <p><strong>Status:</strong> ${successful === total ? '✅ Todos os testes passaram!' : '❌ Alguns testes falharam'}</p>
+                
+                <h4>Detalhes:</h4>
+                <ul>
+                    ${testResults.map(t => 
+                        `<li>${t.result.success ? '✅' : '❌'} ${t.name}</li>`
+                    ).join('')}
+                </ul>
+            `;
+        }
+
+        function clearAllResults() {
+            const results = ['tipos-result', 'funcionarios-result', 'epis-result', 'filters-result', 'summary-result'];
+            results.forEach(id => {
+                const element = document.getElementById(id);
+                element.style.display = 'none';
+                element.innerHTML = '';
+            });
+            
+            document.getElementById('stats-container').style.display = 'none';
+            testResults = [];
+        }
+
+        // Welcome message
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('🦺 EPI Management API Test loaded!');
+            console.log('Click "Executar Todos os Testes" to test all endpoints.');
+        });
+    </script>
+</body>
+</html>

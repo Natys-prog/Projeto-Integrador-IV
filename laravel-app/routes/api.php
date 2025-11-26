@@ -44,7 +44,7 @@ Route::get('/funcionarios', function () {
 
 // API para listar tipos de EPI
 Route::get('/tipos-epi', function () {
-    return TipoEpi::ativo()
+    return TipoEpi::ativos()
                   ->select('id', 'nome', 'codigo', 'icone', 'cor')
                   ->orderBy('nome')
                   ->get();

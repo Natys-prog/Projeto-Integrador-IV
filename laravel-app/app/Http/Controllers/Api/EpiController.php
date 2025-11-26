@@ -12,61 +12,128 @@ class EpiController extends Controller
     // Listar todos os EPIs (API)
     public function index(Request $request)
     {
-        $query = Epi::with(['funcionario', 'tipoEpi']);
+        try {
+            $query = Epi::with(['funcionario', 'tipoEpi']);
 
-        // Aplicar filtros
-        if ($request->has('status')) {
-            $query->where('status', $request->status);
-        }
-
-        if ($request->has('tipo_epi_id')) {
-            $query->where('tipo_epi_id', $request->tipo_epi_id);
-        }
-
-        // Filtro por código de tipo (compatibilidade)
-        if ($request->has('tipo')) {
-            $tipoEpi = TipoEpi::where('codigo', $request->tipo)->first();
-            if ($tipoEpi) {
-                $query->where('tipo_epi_id', $tipoEpi->id);
+            // Aplicar filtros
+            if ($request->filled('status')) {
+                $query->where('status', $request->status);
             }
-        }
 
-        if ($request->has('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('nome', 'like', '%' . $search . '%')
-                  ->orWhere('codigo', 'like', '%' . $search . '%')
-                  ->orWhere('fabricante', 'like', '%' . $search . '%')
-                  ->orWhereHas('tipoEpi', function($tq) use ($search) {
-                      $tq->where('nome', 'like', '%' . $search . '%');
-                  });
-            });
-        }
+            if ($request->filled('tipo_epi_id')) {
+                $query->where('tipo_epi_id', $request->tipo_epi_id);
+            }
 
-        $epis = $query->get();
-        
-        return response()->json([
-            'success' => true,
-            'data' => $epis
-        ]);
+            // Filtro por código de tipo (compatibilidade)
+            if ($request->filled('tipo')) {
+                $tipoEpi = TipoEpi::where('codigo', $request->tipo)->first();
+                if ($tipoEpi) {
+                    $query->where('tipo_epi_id', $tipoEpi->id);
+                }
+            }
+
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function($q) use ($search) {
+                    $q->where('nome', 'like', '%' . $search . '%')
+                      ->orWhere('codigo', 'like', '%' . $search . '%')
+                      ->orWhere('fabricante', 'like', '%' . $search . '%')
+                      ->orWhereHas('tipoEpi', function($tq) use ($search) {
+                          $tq->where('nome', 'like', '%' . $search . '%');
+                      });
+                });
+            }
+
+            // Ordenação
+            $orderBy = $request->get('order_by', 'created_at');
+            $orderDirection = $request->get('order_direction', 'desc');
+            
+            $validOrderBy = ['created_at', 'nome', 'tipo', 'data_vencimento'];
+            if (!in_array($orderBy, $validOrderBy)) {
+                $orderBy = 'created_at';
+            }
+
+            if ($orderBy === 'tipo') {
+                $query->join('tipos_epi', 'epis.tipo_epi_id', '=', 'tipos_epi.id')
+                      ->orderBy('tipos_epi.nome', $orderDirection)
+                      ->select('epis.*');
+            } else {
+                $query->orderBy($orderBy, $orderDirection);
+            }
+
+            $epis = $query->get();
+            
+            // Statistics
+            $statistics = [
+                'total' => $epis->count(),
+                'ativo' => $epis->where('status', 'ativo')->count(),
+                'inativo' => $epis->where('status', 'inativo')->count(),
+                'manutencao' => $epis->where('status', 'manutencao')->count(),
+                'descartado' => $epis->where('status', 'descartado')->count(),
+                'vencidos' => $epis->filter(function($epi) {
+                    return $epi->data_vencimento && $epi->data_vencimento->isPast();
+                })->count(),
+                'vencendo_30_dias' => $epis->filter(function($epi) {
+                    return $epi->data_vencimento && 
+                           $epi->data_vencimento->isFuture() && 
+                           $epi->data_vencimento->diffInDays(now()) <= 30;
+                })->count()
+            ];
+            
+            return response()->json([
+                'success' => true,
+                'data' => $epis,
+                'statistics' => $statistics,
+                'filters_applied' => [
+                    'status' => $request->get('status'),
+                    'tipo_epi_id' => $request->get('tipo_epi_id'),
+                    'search' => $request->get('search'),
+                    'order_by' => $orderBy,
+                    'order_direction' => $orderDirection
+                ]
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Erro ao listar EPIs: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro interno do servidor',
+                'data' => [],
+                'statistics' => []
+            ], 500);
+        }
     }
 
     // Buscar um EPI específico (API)
     public function show($id)
     {
-        $epi = Epi::with('funcionario')->find($id);
-        
-        if (!$epi) {
+        try {
+            $epi = Epi::with(['funcionario', 'tipoEpi'])->find($id);
+            
+            if (!$epi) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'EPI não encontrado',
+                    'data' => null
+                ], 404);
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'EPI encontrado com sucesso',
+                'data' => $epi
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Erro ao buscar EPI: ' . $e->getMessage());
+            
             return response()->json([
                 'success' => false,
-                'message' => 'EPI não encontrado'
-            ], 404);
+                'message' => 'Erro interno do servidor',
+                'data' => null
+            ], 500);
         }
-        
-        return response()->json([
-            'success' => true,
-            'data' => $epi
-        ]);
     }
 
     // Criar novo EPI (API)
@@ -87,6 +154,15 @@ class EpiController extends Controller
             ]);
 
             $validated['status'] = $validated['status'] ?? 'ativo';
+            
+            // Temporary fix: provide a value for the old 'tipo' column until migration is complete
+            if (isset($validated['tipo_epi_id'])) {
+                $tipoEpi = \App\Models\TipoEpi::find($validated['tipo_epi_id']);
+                if ($tipoEpi) {
+                    $validated['tipo'] = $tipoEpi->codigo;
+                }
+            }
+            
             $epi = Epi::create($validated);
             $epi->load(['tipoEpi', 'funcionario']);
 

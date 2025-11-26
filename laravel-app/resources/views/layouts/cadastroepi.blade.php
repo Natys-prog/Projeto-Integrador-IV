@@ -274,12 +274,12 @@
 </head>
 <body>
     <!-- Modal -->
-    <div class="modal-overlay" id="cadastroModal">
-        <div class="modal-container">
+    <div class="modal modal-overlay" id="epi-modal" onclick="handleModalClick(event)">
+        <div class="modal-container modal-content" onclick="event.stopPropagation()">
             <!-- Header -->
             <div class="modal-header">
-                <h2 id="modalTitle">📋 Novo EPI</h2>
-                <button type="button" class="close-btn" onclick="fecharModal()" title="Fechar">&times;</button>
+                <h2 id="modal-title">📋 Novo EPI</h2>
+                <button type="button" class="close-btn" onclick="closeModal()" title="Fechar">&times;</button>
             </div>
 
             <!-- Body -->
@@ -290,7 +290,7 @@
                 <div class="alert alert-warning" id="warningAlert"></div>
 
                 <!-- Form -->
-                <form id="cadastroForm">
+                <form id="epi-form">
                     @csrf
                     <input type="hidden" id="epiId" name="epi_id" value="">
 
@@ -310,17 +310,9 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="tipo">Tipo de EPI *</label>
-                            <select id="tipo" name="tipo" required>
+                            <select id="tipo_epi_id" name="tipo_epi_id" required>
                                 <option value="">Selecione o tipo</option>
-                                <option value="capacete">Capacete</option>
-                                <option value="oculos">Óculos de Proteção</option>
-                                <option value="luvas">Luvas</option>
-                                <option value="botas">Botas de Segurança</option>
-                                <option value="cinto_seguranca">Cinto de Segurança</option>
-                                <option value="mascara">Máscara</option>
-                                <option value="protetor_auditivo">Protetor Auditivo</option>
-                                <option value="colete_refletivo">Colete Refletivo</option>
-                                <option value="outros">Outros</option>
+                                <!-- Populated dynamically via JavaScript -->
                             </select>
                         </div>
 
@@ -415,12 +407,12 @@
 
             <!-- Footer -->
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="fecharModal()">
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">
                     ✕ Cancelar
                 </button>
-                <button type="button" class="btn btn-primary" onclick="enviarFormulario()">
-                    <span class="loading-spinner" id="loadingSpinner"></span>
-                    <span id="btnText">💾 Salvar</span>
+                <button type="submit" class="btn btn-primary" id="submit-btn">
+                    <span id="submit-text">💾 Salvar EPI</span>
+                    <div id="submit-spinner" class="btn-spinner" style="display: none;"></div>
                 </button>
             </div>
         </div>

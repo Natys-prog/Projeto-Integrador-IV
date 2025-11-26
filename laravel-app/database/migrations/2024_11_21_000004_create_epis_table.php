@@ -14,17 +14,12 @@ return new class extends Migration
         Schema::create('epis', function (Blueprint $table) {
             $table->id();
             $table->string('nome');
-            $table->enum('tipo', [
-                'capacete', 
-                'oculos', 
-                'luvas', 
-                'botas', 
-                'cinto_seguranca', 
-                'mascara', 
-                'protetor_auditivo',
-                'colete_refletivo',
-                'outros'
-            ]);
+
+            $table->unsignedBigInteger('tipo_epi_id')->nullable()->after('nome');
+            
+            // Adicionar foreign key
+            $table->foreign('tipo_epi_id')->references('id')->on('tipos_epi')->onDelete('restrict');
+            
             $table->text('descricao')->nullable();
             $table->string('codigo')->unique();
             $table->date('data_aquisicao');
@@ -35,7 +30,6 @@ return new class extends Migration
             $table->foreignId('funcionario_id')->nullable()->constrained('funcionarios')->onDelete('set null');
             $table->timestamps();
 
-            $table->index(['tipo', 'status']);
             $table->index('data_vencimento');
             $table->index('funcionario_id');
         });
