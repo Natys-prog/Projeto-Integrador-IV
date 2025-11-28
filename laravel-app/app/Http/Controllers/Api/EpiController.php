@@ -184,19 +184,29 @@ class EpiController extends Controller
     public function update(Request $request, $id)
     {
         try {
+            \Log::info("=== INÍCIO ATUALIZAÇÃO EPI ===");
+            \Log::info("EPI ID recebido: {$id} (tipo: " . gettype($id) . ")");
+            \Log::info("Dados da requisição:", $request->all());
+            \Log::info("Headers da requisição:", $request->headers->all());
+            \Log::info("Método HTTP:", $request->method());
+            \Log::info("URL completa:", $request->fullUrl());
+            
             $epi = Epi::find($id);
             
             if (!$epi) {
+                \Log::warning("EPI não encontrado: {$id}");
                 return response()->json([
                     'success' => false,
                     'message' => 'EPI não encontrado'
                 ], 404);
             }
 
+            \Log::info("EPI atual:", ['current_epi' => $epi->toArray()]);
+
             $validated = $request->validate([
                 'nome' => 'required|string|max:255',
                 'tipo_epi_id' => 'required|exists:tipos_epi,id',
-                'codigo' => 'required|string|unique:epis,codigo,' . $id,
+                'codigo' => 'required|string|unique:epis,codigo,' . $id . ',id',
                 'status' => 'nullable|string|in:ativo,inativo,manutencao,descartado',
                 'fabricante' => 'nullable|string|max:255',
                 'lote' => 'nullable|string|max:255',
@@ -215,15 +225,27 @@ class EpiController extends Controller
             ]);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error("Erro de validação ao atualizar EPI {$id}:", [
+                'errors' => $e->errors(),
+                'request_data' => $request->all()
+            ]);
+            
+            $errorMessages = collect($e->errors())->flatten()->implode('; ');
+            
             return response()->json([
                 'success' => false,
-                'message' => 'Dados inválidos',
+                'message' => 'Erro de validação: ' . $errorMessages,
                 'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
+            \Log::error("Erro geral ao atualizar EPI {$id}: " . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all()
+            ]);
+            
             return response()->json([
                 'success' => false,
-                'message' => 'Erro interno do servidor'
+                'message' => 'Erro interno do servidor: ' . $e->getMessage()
             ], 500);
         }
     }

@@ -689,6 +689,8 @@
             };
             
             console.log('Dados do formulário:', data);
+            console.log('Modo edição:', modoEdicao);
+            
             return data;
         }
 
@@ -764,6 +766,11 @@
 
             try {
                 const dadosEPI = obterDadosFormulario();
+                console.log('=== DEBUG ATUALIZAÇÃO EPI ===');
+                console.log('ID do EPI:', id, '(tipo:', typeof id, ')');
+                console.log('Dados sendo enviados:', dadosEPI);
+                console.log('URL da requisição:', `/api/epis/${id}`);
+                console.log('============================');
 
                 const response = await fetch(`/api/epis/${id}`, {
                     method: 'PUT',
@@ -799,17 +806,31 @@
                     submitText.style.display = 'block';
                     submitSpinner.style.display = 'none';
                     
-                    mostraAlerta(data.message || 'Erro ao atualizar EPI', 'danger');
+                    console.error('Erro na resposta da API:', data);
+                    
+                    // Mostrar erros mais detalhados se disponível
+                    let errorMessage = data.message || 'Erro ao atualizar EPI';
+                    if (data.errors) {
+                        const validationErrors = Object.values(data.errors).flat();
+                        errorMessage += ': ' + validationErrors.join(', ');
+                    }
+                    
+                    mostraAlerta(errorMessage, 'danger');
                 }
             } catch (error) {
-                console.error('Erro:', error);
+                console.error('Erro na requisição:', error);
                 
                 // Remover loading
                 submitBtn.disabled = false;
                 submitText.style.display = 'block';
                 submitSpinner.style.display = 'none';
                 
-                mostraAlerta('Erro ao processar requisição.', 'danger');
+                let errorMessage = 'Erro ao processar requisição';
+                if (error.message) {
+                    errorMessage += ': ' + error.message;
+                }
+                
+                mostraAlerta(errorMessage, 'danger');
             }
         }
 
