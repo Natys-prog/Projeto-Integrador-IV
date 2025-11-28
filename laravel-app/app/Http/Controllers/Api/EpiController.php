@@ -186,10 +186,11 @@ class EpiController extends Controller
         try {
             \Log::info("=== INÍCIO ATUALIZAÇÃO EPI ===");
             \Log::info("EPI ID recebido: {$id} (tipo: " . gettype($id) . ")");
-            \Log::info("Dados da requisição:", $request->all());
-            \Log::info("Headers da requisição:", $request->headers->all());
-            \Log::info("Método HTTP:", $request->method());
-            \Log::info("URL completa:", $request->fullUrl());
+            \Log::info("Content-Type: " . $request->header('Content-Type'));
+            \Log::info("Accept: " . $request->header('Accept'));
+            \Log::info("Dados da requisição", $request->all());
+            \Log::info("Método HTTP: " . $request->method());
+            \Log::info("URL completa: " . $request->fullUrl());
             
             $epi = Epi::find($id);
             
@@ -201,7 +202,19 @@ class EpiController extends Controller
                 ], 404);
             }
 
-            \Log::info("EPI atual:", ['current_epi' => $epi->toArray()]);
+            \Log::info("EPI atual", ['current_epi' => $epi->toArray()]);
+
+            // Debug: verificar se os campos estão chegando
+            $debugData = [
+                'has_nome' => $request->has('nome'),
+                'has_tipo_epi_id' => $request->has('tipo_epi_id'), 
+                'has_codigo' => $request->has('codigo'),
+                'nome_value' => $request->input('nome'),
+                'tipo_epi_id_value' => $request->input('tipo_epi_id'),
+                'codigo_value' => $request->input('codigo'),
+                'all_input' => $request->all()
+            ];
+            \Log::info("Debug dados recebidos", $debugData);
 
             $validated = $request->validate([
                 'nome' => 'required|string|max:255',
@@ -216,36 +229,57 @@ class EpiController extends Controller
                 'descricao' => 'nullable|string',
             ]);
 
-            $epi->update($validated);
+            \Log::info("Dados validados com sucesso", $validated);
 
+            // Definir valores padrão
+            $validated['status'] = $validated['status'] ?? 'ativo';
+            $validated['data_aquisicao'] = $validated['data_aquisicao'] ?? now()->format('Y-m-d');
+            
+            // Atualizar o EPI
+            $epi->update($validated);
+            
+            // Carregar relacionamentos para resposta
+            $epi->load(['funcionario', 'tipoEpi']);
+
+            \Log::info("EPI atualizado com sucesso", ['epi_id' => $epi->id, 'epi_updated' => $epi->toArray()]);
+
+            // SEMPRE retornar JSON para API
             return response()->json([
                 'success' => true,
                 'message' => 'EPI atualizado com sucesso!',
-                'data' => $epi->load(['funcionario', 'tipoEpi'])
-            ]);
+                'data' => $epi
+            ], 200);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
-            \Log::error("Erro de validação ao atualizar EPI {$id}:", [
+            \Log::error("Erro de validação na atualização do EPI", [
+                'epi_id' => $id,
                 'errors' => $e->errors(),
-                'request_data' => $request->all()
+                'input' => $request->all(),
+                'content_type' => $request->header('Content-Type'),
+                'accept' => $request->header('Accept')
             ]);
-            
-            $errorMessages = collect($e->errors())->flatten()->implode('; ');
             
             return response()->json([
                 'success' => false,
-                'message' => 'Erro de validação: ' . $errorMessages,
-                'errors' => $e->errors()
+                'message' => 'Dados inválidos',
+                'errors' => $e->errors(),
+                'debug' => [
+                    'received_data' => $request->all(),
+                    'content_type' => $request->header('Content-Type')
+                ]
             ], 422);
+            
         } catch (\Exception $e) {
-            \Log::error("Erro geral ao atualizar EPI {$id}: " . $e->getMessage(), [
-                'trace' => $e->getTraceAsString(),
-                'request_data' => $request->all()
+            \Log::error("Erro interno ao atualizar EPI", [
+                'epi_id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
             
             return response()->json([
                 'success' => false,
-                'message' => 'Erro interno do servidor: ' . $e->getMessage()
+                'message' => 'Erro interno do servidor',
+                'error_details' => $e->getMessage()
             ], 500);
         }
     }
