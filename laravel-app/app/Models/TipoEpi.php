@@ -35,7 +35,7 @@ class TipoEpi extends Model
     // Scopes
     public function scopeAtivos($query)
     {
-        return $query->where('ativo', true);
+        return $query->where('status', 'ativo');
     }
 
     public function scopePorCodigo($query, $codigo)

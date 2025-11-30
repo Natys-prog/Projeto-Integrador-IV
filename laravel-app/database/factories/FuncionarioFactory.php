@@ -12,8 +12,6 @@ class FuncionarioFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
-     *
-     * @var string
      */
     protected $model = Funcionario::class;
 
@@ -43,11 +41,42 @@ class FuncionarioFactory extends Factory
             'departamento' => $departamento,
             'cargo' => $this->faker->randomElement($cargos[$departamento]),
             'data_admissao' => $this->faker->dateTimeBetween('-2 years', 'now'),
-            'status' => $this->faker->randomElement(['ativo', 'ativo', 'ativo', 'inativo']), // 75% ativo
+            'status' => $this->faker->randomElement(['ativo', 'ativo', 'ativo', 'ativo', 'inativo']), // 80% ativo
             'endereco' => $this->faker->streetAddress(),
             'cep' => $this->faker->numerify('########'),
             'cidade' => $this->faker->city(),
             'estado' => $this->faker->stateAbbr(),
         ];
+    }
+
+    /**
+     * Funcionários novos (últimos 30 dias)
+     */
+    public function novo(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'data_admissao' => $this->faker->dateTimeBetween('-30 days', 'now'),
+            'status' => 'ativo',
+        ]);
+    }
+
+    /**
+     * Funcionários inativos
+     */
+    public function inativo(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => 'inativo',
+        ]);
+    }
+
+    /**
+     * Funcionários afastados
+     */
+    public function afastado(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => 'afastado',
+        ]);
     }
 }

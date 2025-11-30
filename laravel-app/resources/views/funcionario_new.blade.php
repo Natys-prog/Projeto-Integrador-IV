@@ -54,8 +54,8 @@
         </button>
     </div>
     
-    <div class="filters-grid">
-        <div class="filter-item">
+    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; align-items: end;">
+        <div>
             <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #4a5568; font-size: 0.875rem;">Buscar</label>
             <div style="display: flex;">
                 <input type="text" id="search-input" placeholder="Nome, matrícula, email ou CPF..." style="flex: 1; padding: 0.75rem; border: 1px solid #cbd5e0; border-radius: 6px 0 0 6px; font-size: 0.875rem;" />
@@ -65,7 +65,7 @@
             </div>
         </div>
         
-        <div class="filter-item">
+        <div>
             <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #4a5568; font-size: 0.875rem;">Status</label>
             <select id="status-filter" style="width: 100%; padding: 0.75rem; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 0.875rem;">
                 <option value="">Todos os Status</option>
@@ -76,7 +76,7 @@
             </select>
         </div>
         
-        <div class="filter-item">
+        <div>
             <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #4a5568; font-size: 0.875rem;">Departamento</label>
             <select id="departamento-filter" style="width: 100%; padding: 0.75rem; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 0.875rem;">
                 <option value="">Todos os Departamentos</option>
@@ -84,7 +84,7 @@
             </select>
         </div>
         
-        <div class="filter-item">
+        <div>
             <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #4a5568; font-size: 0.875rem;">Ordenar por</label>
             <select id="order-filter" style="width: 100%; padding: 0.75rem; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 0.875rem;">
                 <option value="created_at">Data de Criação</option>
@@ -119,7 +119,7 @@
     </div>
 
     <!-- Table -->
-    <div class="table-responsive" style="overflow-x: auto;">
+    <div style="overflow-x: auto;">
         <table id="funcionarios-table" style="width: 100%; border-collapse: collapse; display: none;">
             <thead>
                 <tr style="background-color: #f8f9fa; border-bottom: 2px solid #dee2e6;">
@@ -136,7 +136,6 @@
                 <!-- Populated dynamically -->
             </tbody>
         </table>
-        </div>
     </div>
 </div>
 
@@ -342,14 +341,11 @@
 
 /* Status badges */
 .status-badge {
-    padding: 0.125rem 0.5rem;
-    border-radius: 8px;
-    font-size: 0.625rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
-    white-space: nowrap;
-    display: inline-block;
-    line-height: 1.2;
 }
 
 .status-badge.ativo { background: #d1fae5; color: #065f46; }
@@ -442,123 +438,6 @@ table td {
     
     th, td {
         padding: 0.5rem !important;
-    }
-}
-
-/* Responsive Filters Grid */
-.filters-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
-    gap: 1rem;
-    align-items: end;
-}
-
-.filter-item {
-    min-width: 0;
-}
-
-/* Table Responsive Wrapper */
-.table-responsive {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-}
-
-/* Additional Media Queries for Better Responsiveness */
-@media screen and (max-width: 1200px) {
-    .filters-grid {
-        grid-template-columns: 2fr 1fr 1fr;
-        gap: 0.75rem;
-    }
-    
-    .filter-item:last-child {
-        grid-column: 1 / -1;
-        max-width: 200px;
-    }
-}
-
-@media screen and (max-width: 968px) {
-    .filters-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-    }
-    
-    .filter-item:first-child {
-        grid-column: 1 / -1;
-    }
-    
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
-    }
-    
-    table th:nth-child(3),
-    table td:nth-child(3),
-    table th:nth-child(4), 
-    table td:nth-child(4) {
-        display: none;
-    }
-}
-
-@media screen and (max-width: 640px) {
-    .filters-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-    
-    .stats-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-    
-    .card {
-        padding: 1rem;
-        margin: 0.5rem 0;
-    }
-    
-    .table-responsive {
-        font-size: 0.75rem;
-    }
-    
-    table th:nth-child(2),
-    table td:nth-child(2),
-    table th:nth-child(5),
-    table td:nth-child(5),
-    table th:nth-child(6),
-    table td:nth-child(6) {
-        display: none;
-    }
-    
-    .action-buttons {
-        flex-direction: column;
-        gap: 0.25rem;
-    }
-    
-    .action-btn {
-        width: 28px;
-        height: 28px;
-        font-size: 0.75rem;
-    }
-    
-    .funcionario-info {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.25rem;
-    }
-    
-    .funcionario-avatar {
-        width: 32px;
-        height: 32px;
-        font-size: 0.75rem;
-    }
-    
-    .funcionario-details h4 {
-        font-size: 0.875rem;
-        margin-bottom: 0.125rem;
-    }
-    
-    .funcionario-details p {
-        font-size: 0.75rem;
-        margin-bottom: 0.125rem;
     }
 }
 </style>
@@ -694,17 +573,7 @@ async function loadFuncionarios() {
     try {
         console.log('👥 Carregando funcionários...');
         const response = await apiRequest(`${API_BASE}/funcionarios`);
-        
-        // A API retorna { success: true, data: [...], statistics: {...} }
-        if (response && response.success && Array.isArray(response.data)) {
-            funcionariosData = response.data;
-        } else if (Array.isArray(response)) {
-            funcionariosData = response;
-        } else {
-            console.warn('⚠️ Resposta da API não está no formato esperado:', response);
-            funcionariosData = [];
-        }
-        
+        funcionariosData = response;
         console.log('✅ Funcionários carregados:', funcionariosData.length);
     } catch (error) {
         console.error('❌ Erro ao carregar funcionários:', error);
@@ -764,12 +633,6 @@ function renderFuncionariosTable() {
     const tbody = document.getElementById('funcionarios-tbody');
     
     if (!tbody) return;
-
-    // Garantir que funcionariosData é um array
-    if (!Array.isArray(funcionariosData)) {
-        console.error('❌ funcionariosData não é um array:', funcionariosData);
-        funcionariosData = [];
-    }
 
     if (funcionariosData.length === 0) {
         showEmptyState();
@@ -871,15 +734,12 @@ function getStatusIcon(status) {
 }
 
 function updateStatistics() {
-    // Garantir que funcionariosData é um array
-    const dataArray = Array.isArray(funcionariosData) ? funcionariosData : [];
-    
     const stats = {
-        total: dataArray.length,
-        ativo: dataArray.filter(f => f.status === 'ativo').length,
-        inativo: dataArray.filter(f => f.status === 'inativo').length,
-        afastado: dataArray.filter(f => f.status === 'afastado').length,
-        demitido: dataArray.filter(f => f.status === 'demitido').length
+        total: funcionariosData.length,
+        ativo: funcionariosData.filter(f => f.status === 'ativo').length,
+        inativo: funcionariosData.filter(f => f.status === 'inativo').length,
+        afastado: funcionariosData.filter(f => f.status === 'afastado').length,
+        demitido: funcionariosData.filter(f => f.status === 'demitido').length
     };
 
     const totalElement = document.getElementById('total-funcionarios');
@@ -1000,17 +860,7 @@ async function applyFilters() {
         });
         
         const url = `${API_BASE}/funcionarios?${queryParams.toString()}`;
-        const response = await apiRequest(url);
-        
-        // A API retorna { success: true, data: [...], statistics: {...} }
-        if (response && response.success && Array.isArray(response.data)) {
-            funcionariosData = response.data;
-        } else if (Array.isArray(response)) {
-            funcionariosData = response;
-        } else {
-            console.warn('⚠️ Resposta da API não está no formato esperado:', response);
-            funcionariosData = [];
-        }
+        funcionariosData = await apiRequest(url);
         
         renderFuncionariosTable();
         updateStatistics();

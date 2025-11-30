@@ -1,94 +1,134 @@
 <?php
-// Executar: php artisan make:seeder TiposEpiSeeder
 // filepath: c:\Users\mrros\source\repos\Projeto-Integrador-IV\laravel-app\database\seeders\TiposEpiSeeder.php
 
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\TipoEpi;
+use Illuminate\Support\Facades\DB;
 
 class TiposEpiSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $tipos = [
+        // Verificar se já existem dados para evitar duplicatas
+        if (DB::table('tipos_epi')->count() > 0) {
+            $this->command->info('ℹ️  Tipos de EPI já existem, pulando inserção...');
+            return;
+        }
+
+        $tiposEpi = [
             [
                 'nome' => 'Capacete de Segurança',
                 'codigo' => 'capacete',
-                'descricao' => 'Equipamento de proteção para a cabeça',
+                'descricao' => 'Equipamento de proteção para a cabeça contra impactos e quedas de objetos',
                 'icone' => '⛑️',
-                'cor' => '#FF6B35'
+                'cor' => '#FF6B35',
+                'categoria' => 'Proteção da Cabeça',
+                'validade_meses' => 60,
+                'status' => 'ativo',
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'nome' => 'Óculos de Proteção',
                 'codigo' => 'oculos',
-                'descricao' => 'Proteção para os olhos',
+                'descricao' => 'Proteção dos olhos contra partículas, radiação e respingos químicos',
                 'icone' => '🥽',
-                'cor' => '#4ECDC4'
+                'cor' => '#4ECDC4',
+                'categoria' => 'Proteção dos Olhos',
+                'validade_meses' => 18,
+                'status' => 'ativo',
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'nome' => 'Luvas de Segurança',
                 'codigo' => 'luvas',
-                'descricao' => 'Proteção para as mãos',
+                'descricao' => 'Proteção das mãos contra cortes, produtos químicos e temperatura',
                 'icone' => '🧤',
-                'cor' => '#45B7D1'
+                'cor' => '#45B7D1',
+                'categoria' => 'Proteção das Mãos',
+                'validade_meses' => 6,
+                'status' => 'ativo',
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
-                'nome' => 'Botas de Segurança',
+                'nome' => 'Calçados de Segurança',
                 'codigo' => 'botas',
-                'descricao' => 'Calçados de proteção',
+                'descricao' => 'Proteção dos pés contra perfurações, impactos e produtos químicos',
                 'icone' => '🥾',
-                'cor' => '#8B4513'
+                'cor' => '#F7DC6F',
+                'categoria' => 'Proteção dos Pés',
+                'validade_meses' => 36,
+                'status' => 'ativo',
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'nome' => 'Cinto de Segurança',
                 'codigo' => 'cinto_seguranca',
-                'descricao' => 'Equipamento para trabalho em altura',
-                'icone' => '🔗',
-                'cor' => '#FF8C42'
+                'descricao' => 'Equipamento para trabalho em altura e prevenção de quedas',
+                'icone' => '🦺',
+                'cor' => '#E74C3C',
+                'categoria' => 'Proteção contra Quedas',
+                'validade_meses' => 60,
+                'status' => 'ativo',
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'nome' => 'Máscara Respiratória',
                 'codigo' => 'mascara',
-                'descricao' => 'Proteção respiratória',
+                'descricao' => 'Proteção das vias respiratórias contra gases, vapores e partículas',
                 'icone' => '😷',
-                'cor' => '#6A994E'
+                'cor' => '#A569BD',
+                'categoria' => 'Proteção Respiratória',
+                'validade_meses' => 3,
+                'status' => 'ativo',
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'nome' => 'Protetor Auditivo',
                 'codigo' => 'protetor_auditivo',
-                'descricao' => 'Proteção contra ruídos',
+                'descricao' => 'Proteção auditiva contra ruídos excessivos no ambiente de trabalho',
                 'icone' => '🎧',
-                'cor' => '#A663CC'
+                'cor' => '#58D68D',
+                'categoria' => 'Proteção Auditiva',
+                'validade_meses' => 24,
+                'status' => 'ativo',
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'nome' => 'Colete Refletivo',
                 'codigo' => 'colete_refletivo',
-                'descricao' => 'Vestimenta de alta visibilidade',
+                'descricao' => 'Vestimenta de alta visibilidade para trabalhos em vias públicas',
                 'icone' => '🦺',
-                'cor' => '#F77F00'
+                'cor' => '#F39C12',
+                'categoria' => 'Vestimentas de Segurança',
+                'validade_meses' => 12,
+                'status' => 'ativo',
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
-                'nome' => 'Uniforme de Segurança',
-                'codigo' => 'uniforme',
-                'descricao' => 'Vestimenta adequada para trabalho',
-                'icone' => '👔',
-                'cor' => '#277DA1'
-            ],
-            [
-                'nome' => 'Outros',
+                'nome' => 'Outros EPIs',
                 'codigo' => 'outros',
-                'descricao' => 'Outros equipamentos de proteção',
+                'descricao' => 'Outros equipamentos de proteção individual diversos',
                 'icone' => '🛡️',
-                'cor' => '#6C757D'
-            ]
+                'cor' => '#95A5A6',
+                'categoria' => 'Diversos',
+                'validade_meses' => 12,
+                'status' => 'ativo',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ];
 
-        foreach ($tipos as $tipo) {
-            TipoEpi::create($tipo);
-        }
+        DB::table('tipos_epi')->insert($tiposEpi);
+        
+        $this->command->info('✅ ' . count($tiposEpi) . ' tipos de EPI inseridos com sucesso!');
     }
 }

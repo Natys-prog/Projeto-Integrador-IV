@@ -883,14 +883,24 @@ function openModal(mode, epiId = null) {
         console.log('Form event listener attached');
     }
 
-    modal.classList.add('show');
+    // Override the submit button onclick to use our handler
+    if (submitBtn) {
+        submitBtn.onclick = function(e) {
+            e.preventDefault();
+            console.log('Submit button clicked, using handleFormSubmit');
+            handleFormSubmit();
+        };
+        console.log('Submit button onclick overridden');
+    }
+
+    modal.classList.add('active');
     document.body.style.overflow = 'hidden';
     console.log('Modal should now be visible with class:', modal.className);
 }
 
 function closeModal() {
     const modal = document.getElementById('epi-modal');
-    modal.classList.remove('show');
+    modal.classList.remove('active');
     document.body.style.overflow = '';
     clearForm();
     clearErrors();

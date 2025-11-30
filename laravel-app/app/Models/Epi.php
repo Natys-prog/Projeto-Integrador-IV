@@ -14,6 +14,7 @@ class Epi extends Model
     
     protected $fillable = [
         'nome',
+        'tipo',
         'tipo_epi_id', // FK para tipos_epi
         'codigo',
         'status',

@@ -34,10 +34,11 @@ Route::prefix('funcionarios')->group(function () {
     Route::get('{id}/epis', [FuncionarioController::class, 'epis']);       // GET /api/funcionarios/1/epis
 });
 
-// API para listar funcionários (para uso nos selects)
-Route::get('/funcionarios', function () {
+// API para listar funcionários simples (para uso nos selects)
+Route::get('/funcionarios-select', function () {
     $funcionarios = Funcionario::where('status', 'ativo')
-                              ->select('id', 'nome', 'departamento')
+                              ->with('departamento')
+                              ->select('id', 'nome', 'departamento_id')
                               ->orderBy('nome')
                               ->get();
     
@@ -57,5 +58,31 @@ Route::get('/tipos-epi', function () {
     return response()->json([
         'success' => true,
         'data' => $tipos
+    ]);
+});
+
+// APIs auxiliares
+Route::get('/departamentos', function () {
+    return App\Models\Departamento::ativo()
+                  ->select('id', 'nome', 'codigo', 'cor')
+                  ->orderBy('nome')
+                  ->get();
+});
+
+Route::get('/cargos', function () {
+    return App\Models\Cargo::ativo()
+                  ->select('id', 'nome', 'codigo', 'nivel')
+                  ->orderBy('nome')
+                  ->get();
+});
+
+// Rota de teste para debug
+Route::get('/funcionarios-test', function () {
+    $funcionarios = App\Models\Funcionario::with(['departamento', 'cargo'])->get();
+    return response()->json([
+        'success' => true,
+        'count' => $funcionarios->count(),
+        'data' => $funcionarios,
+        'debug' => 'Test route working'
     ]);
 });

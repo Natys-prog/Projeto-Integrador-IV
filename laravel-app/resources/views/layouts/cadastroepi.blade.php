@@ -12,9 +12,8 @@
             box-sizing: border-box;
         }
 
-        /* Modal Overlay */
+        /* Modal Overlay - Versão corrigida */
         .modal-overlay {
-            display: none;
             position: fixed;
             top: 0;
             left: 0;
@@ -22,13 +21,14 @@
             bottom: 0;
             background: rgba(0, 0, 0, 0.5);
             z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
             animation: fadeIn 0.3s ease-in-out;
         }
 
         .modal-overlay.active {
             display: flex !important;
-            justify-content: center;
-            align-items: center;
         }
 
         @keyframes fadeIn {
@@ -362,7 +362,7 @@
             <!-- Header -->
             <div class="modal-header">
                 <h2 id="modal-title">📋 Novo EPI</h2>
-                <button type="button" class="close-btn" onclick="fecharModal()" title="Fechar">&times;</button>
+                <button type="button" class="close-btn" id="modal-close-btn" title="Fechar">&times;</button>
             </div>
 
             <!-- Body -->
@@ -519,15 +519,29 @@
 
         // Fechar Modal
         function fecharModal() {
-            console.log('fecharModal chamada');
+            console.log('=== FECHAR MODAL FORÇADO ===');
+            
             const modal = document.getElementById('epi-modal');
+            
             if (modal) {
+                // Múltiplas tentativas de fechar
                 modal.classList.remove('active');
-                console.log('Modal fechado');
-            } else {
-                console.error('Modal não encontrado');
+                modal.style.display = 'none';
+                
+                // Forçar após um delay
+                setTimeout(() => {
+                    modal.classList.remove('active');
+                    modal.style.display = 'none';
+                }, 10);
+                
+                console.log('Modal forçado a fechar');
             }
+            
+            // Restaurar scroll
             document.body.style.overflow = 'auto';
+            document.body.style.overflow = '';
+            
+            // Limpar e resetar
             limparFormulario();
             modoEdicao = false;
         }
@@ -993,6 +1007,16 @@
             const toastContainer = document.getElementById('toast-container');
             if (toastContainer) {
                 toastContainer.addEventListener('click', fecharToast);
+            }
+
+            // Versão alternativa para o botão de fechar
+            const closeBtn = document.getElementById('modal-close-btn');
+            if (closeBtn) {
+                closeBtn.onclick = function(e) {
+                    e.preventDefault();
+                    console.log('Botão fechar clicado - versão alternativa');
+                    fecharModal();
+                };
             }
         });
 

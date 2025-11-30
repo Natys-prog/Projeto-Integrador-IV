@@ -143,6 +143,7 @@ class EpiController extends Controller
             $validated = $request->validate([
                 'nome' => 'required|string|max:255',
                 'tipo_epi_id' => 'required|exists:tipos_epi,id',
+                'tipo' => 'nullable|string|in:capacete,oculos,luvas,botas,cinto_seguranca,mascara,protetor_auditivo,colete_refletivo,outros',
                 'codigo' => 'required|string|unique:epis,codigo',
                 'status' => 'nullable|string|in:ativo,inativo,manutencao,descartado',
                 'fabricante' => 'nullable|string|max:255',
@@ -155,6 +156,26 @@ class EpiController extends Controller
 
             $validated['status'] = $validated['status'] ?? 'ativo';
             $validated['data_aquisicao'] = $validated['data_aquisicao'] ?? now()->format('Y-m-d');
+            
+            // Se não foi fornecido o campo 'tipo', usar um valor padrão baseado no tipo_epi_id
+            if (!isset($validated['tipo'])) {
+                $tipoEpi = \App\Models\TipoEpi::find($validated['tipo_epi_id']);
+                if ($tipoEpi) {
+                    // Mapear códigos conhecidos para tipos
+                    $tipoMap = [
+                        'CAP' => 'capacete',
+                        'capacete' => 'capacete',
+                        'OCU' => 'oculos', 
+                        'oculos' => 'oculos',
+                        'LUV' => 'luvas',
+                        'luvas' => 'luvas',
+                        'botas' => 'botas'
+                    ];
+                    $validated['tipo'] = $tipoMap[$tipoEpi->codigo] ?? 'outros';
+                } else {
+                    $validated['tipo'] = 'outros';
+                }
+            }
             
             $epi = Epi::create($validated);
             $epi->load(['tipoEpi', 'funcionario']);
