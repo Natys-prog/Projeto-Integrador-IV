@@ -15,9 +15,12 @@
         <button class="btn-primary" onclick="openModal('create')" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">
             ➕ Novo EPI
         </button>
-        <button onclick="testDirectSubmit()" style="background: #f39c12; color: white; border: none; padding: 0.75rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.8rem;">
-            🧪 Teste API
+        <button onclick="refreshData()" style="background: #34495e; color: white; border: none; padding: 0.75rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer;">
+            🔄 Atualizar
         </button>
+        <!-- <button onclick="testDirectSubmit()" style="background: #f39c12; color: white; border: none; padding: 0.75rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.8rem;">
+            🧪 Teste API
+        </button> -->
     </div>
 </div>
 
@@ -1165,6 +1168,13 @@ function removeNotification(notification) {
         }, 300);
     }
 }
+
+async function refreshData() {
+    showNotification('Atualizando dados...', 'info');
+    await initializeApp();
+    showNotification('Dados atualizados com sucesso!', 'success');
+}
+
 
 // Test function for debugging
 async function testDirectSubmit() {
