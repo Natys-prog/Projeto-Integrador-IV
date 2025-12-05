@@ -4,31 +4,61 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Funcionario extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'funcionarios';
-    
+
     protected $fillable = [
         'nome',
         'cpf',
+        'rg',
+        'data_nascimento',
+        'genero',
         'email',
-        'telefone',
-        'departamento',
-        'cargo',
-        'data_admissao',
+        'matricula',
         'status',
-        'endereco',
+        'departamento_id',
+        'cargo_id',
+        'data_admissao',
+        'data_demissao',
+        'telefone',
+        'telefone_emergencia',
+        'contato_emergencia',
         'cep',
         'cidade',
         'estado',
+        'endereco',
+        'endereco_completo',
+        'observacoes',
     ];
 
     protected $casts = [
+        'data_nascimento' => 'date',
         'data_admissao' => 'date',
+        'data_demissao' => 'date',
+        'status' => 'string',
+        'genero' => 'string',
     ];
+
+    /**
+     * Relacionamento com departamento
+     */
+    public function departamento()
+    {
+        return $this->belongsTo(Departamento::class);
+    }
+
+    /**
+     * Relacionamento com cargo
+     */
+    public function cargo()
+    {
+        return $this->belongsTo(Cargo::class);
+    }
 
     /**
      * Relacionamento com EPIs
@@ -39,77 +69,10 @@ class Funcionario extends Model
     }
 
     /**
-     * EPIs ativos do funcionário
-     */
-    public function episAtivos()
-    {
-        return $this->epis()->where('status', 'ativo');
-    }
-
-    /**
-     * EPIs próximos ao vencimento do funcionário
-     */
-    public function episProximosVencimento($dias = 30)
-    {
-        return $this->epis()
-                   ->where('data_vencimento', '<=', now()->addDays($dias))
-                   ->where('data_vencimento', '>', now());
-    }
-
-    /**
-     * EPIs vencidos do funcionário
-     */
-    public function episVencidos()
-    {
-        return $this->epis()
-                   ->where('data_vencimento', '<', now());
-    }
-
-    /**
-     * Verifica se o funcionário tem EPIs vencidos
-     */
-    public function hasEpisVencidos()
-    {
-        return $this->episVencidos()->count() > 0;
-    }
-
-    /**
      * Scope para funcionários ativos
      */
-    public function scopeAtivos($query)
+    public function scopeAtivo($query)
     {
         return $query->where('status', 'ativo');
-    }
-
-    /**
-     * Scope para funcionários por departamento
-     */
-    public function scopePorDepartamento($query, $departamento)
-    {
-        return $query->where('departamento', $departamento);
-    }
-
-    /**
-     * Scope para funcionários novos (últimos 30 dias)
-     */
-    public function scopeNovos($query, $dias = 30)
-    {
-        return $query->where('data_admissao', '>=', now()->subDays($dias));
-    }
-
-    /**
-     * Get the full name attribute
-     */
-    public function getFullNameAttribute()
-    {
-        return $this->nome;
-    }
-
-    /**
-     * Get formatted CPF
-     */
-    public function getFormattedCpfAttribute()
-    {
-        return preg_replace('/(\d{3})(\d{3})(\d{3})(\d{2})/', '$1.$2.$3-$4', $this->cpf);
     }
 }

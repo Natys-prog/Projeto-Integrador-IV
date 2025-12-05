@@ -7,32 +7,86 @@ use Illuminate\Http\Request;
 
 class EpiController extends Controller
 {
-    // Listar todos os EPIs (apenas os não deletados)
-    public function index()
+    // Listar todos os EPIs com paginação e filtros (para views web)
+    public function index(Request $request)
     {
-        $epis = Epi::all(); // Busca apenas EPIs com deleted_at = NULL
-        
+        $query = Epi::with('funcionario');
+
+        // Filtros opcionais
+        if ($request->has('status') && $request->status != '') {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->has('tipo_epi_id') && $request->tipo_epi_id != '') {
+            $query->where('tipo_epi_id', $request->tipo_epi_id);
+        }
+
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nome', 'like', '%' . $search . '%')
+                  ->orWhere('codigo', 'like', '%' . $search . '%')
+                  ->orWhere('fabricante', 'like', '%' . $search . '%');
+            });
+        }
+
+        // Ordenação
+        $orderBy = $request->get('order_by', 'created_at');
+        $orderDirection = $request->get('order_direction', 'desc');
+        $query->orderBy($orderBy, $orderDirection);
+
+        // Paginação (15 itens por página)
+        $perPage = $request->get('per_page', 15);
+        $epis = $query->paginate($perPage);
+
+        // Manter parâmetros da query string na paginação
+        $epis->appends($request->query());
+
         return view('epi', [
             'epis' => $epis,
+            'filters' => $request->only(['status', 'tipo_epi_id', 'search', 'order_by', 'order_direction']),
             'serverTime' => date('Y-m-d H:i:s')
         ]);
     }
 
-    // Listar EPIs deletados (para recuperação/auditoria)
-    public function trashed()
+    // Mostrar formulário de criação
+    public function create()
     {
-        $epis = Epi::onlyTrashed()->get(); // Busca apenas deletados
-        
-        return view('epi.trashed', [
-            'epis' => $epis,
-            'serverTime' => date('Y-m-d H:i:s')
+        return view('epi.create');
+    }
+
+    // Salvar novo EPI
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'nome' => 'required|string|max:255',
+            'tipo_epi_id' => 'required|exists:tipos_epi,id',
+            'codigo' => 'required|string|unique:epis,codigo',
+            'status' => 'nullable|string|in:ativo,inativo,manutencao,descartado',
+            'fabricante' => 'nullable|string|max:255',
+            'lote' => 'nullable|string|max:255',
+            'funcionario_id' => 'nullable|exists:funcionarios,id',
+            'data_aquisicao' => 'nullable|date',
+            'data_vencimento' => 'nullable|date',
+            'descricao' => 'nullable|string',
         ]);
+
+        $validated['status'] = $validated['status'] ?? 'ativo';
+        $validated['data_aquisicao'] = $validated['data_aquisicao'] ?? now()->format('Y-m-d');
+
+        $epi = Epi::create($validated);
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'EPI cadastrado com sucesso!', 'epi' => $epi], 201);
+        }
+
+        return redirect()->route('epi.index')->with('success', 'EPI cadastrado com sucesso!');
     }
 
     // Mostrar um EPI específico
     public function show($id)
     {
-        $epi = Epi::find($id); // Busca por ID
+        $epi = Epi::with('funcionario')->find($id);
         
         if (!$epi) {
             return redirect()->route('epi.index')->with('error', 'EPI não encontrado');
@@ -41,25 +95,11 @@ class EpiController extends Controller
         return view('epi.show', ['epi' => $epi]);
     }
 
-    // Salvar novo EPI
-    public function store(Request $request)
+    // Mostrar formulário de edição
+    public function edit($id)
     {
-        $validated = $request->validate([
-            'nome' => 'required|string|max:255',
-            'tipo' => 'required|string',
-            'categoria' => 'required|string',
-            'quantidade' => 'required|integer|min:0',
-            'data_validade' => 'nullable|date',
-            'data_aquisicao' => 'nullable|date',
-            'fabricante' => 'nullable|string',
-            'modelo' => 'nullable|string',
-            'norma' => 'nullable|string',
-            'descricao' => 'nullable|string',
-        ]);
-
-        Epi::create($validated);
-
-        return response()->json(['message' => 'EPI cadastrado com sucesso!'], 201);
+        $epi = Epi::findOrFail($id);
+        return view('epi.edit', ['epi' => $epi]);
     }
 
     // Atualizar EPI
@@ -73,23 +113,27 @@ class EpiController extends Controller
 
         $validated = $request->validate([
             'nome' => 'required|string|max:255',
-            'tipo' => 'required|string',
-            'categoria' => 'required|string',
-            'quantidade' => 'required|integer|min:0',
-            'data_validade' => 'nullable|date',
+            'tipo_epi_id' => 'required|exists:tipos_epi,id',
+            'codigo' => 'required|string|unique:epis,codigo,' . $id,
+            'status' => 'nullable|string|in:ativo,inativo,manutencao,descartado',
+            'fabricante' => 'nullable|string|max:255',
+            'lote' => 'nullable|string|max:255',
+            'funcionario_id' => 'nullable|exists:funcionarios,id',
             'data_aquisicao' => 'nullable|date',
-            'fabricante' => 'nullable|string',
-            'modelo' => 'nullable|string',
-            'norma' => 'nullable|string',
+            'data_vencimento' => 'nullable|date',
             'descricao' => 'nullable|string',
         ]);
 
         $epi->update($validated);
 
-        return response()->json(['message' => 'EPI atualizado com sucesso!', 'epi' => $epi]);
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'EPI atualizado com sucesso!', 'epi' => $epi]);
+        }
+
+        return redirect()->route('epi.index')->with('success', 'EPI atualizado com sucesso!');
     }
 
-    // Deletar EPI (soft delete - registra data/hora)
+    // Deletar EPI (soft delete)
     public function destroy($id)
     {
         $epi = Epi::find($id);
@@ -98,36 +142,8 @@ class EpiController extends Controller
             return response()->json(['message' => 'EPI não encontrado'], 404);
         }
 
-        $epi->delete(); // Apenas registra a data em deleted_at
+        $epi->delete();
 
-        return response()->json(['message' => 'EPI deletado com sucesso! Data: ' . $epi->deleted_at]);
-    }
-
-    // Restaurar EPI deletado
-    public function restore($id)
-    {
-        $epi = Epi::withTrashed()->find($id);
-        
-        if (!$epi) {
-            return response()->json(['message' => 'EPI não encontrado'], 404);
-        }
-
-        $epi->restore(); // Remove o deleted_at (volta a NULL)
-
-        return response()->json(['message' => 'EPI restaurado com sucesso!']);
-    }
-
-    // Deletar permanentemente (hard delete)
-    public function forceDelete($id)
-    {
-        $epi = Epi::withTrashed()->find($id);
-        
-        if (!$epi) {
-            return response()->json(['message' => 'EPI não encontrado'], 404);
-        }
-
-        $epi->forceDelete(); // Remove do banco de verdade
-
-        return response()->json(['message' => 'EPI deletado permanentemente!']);
+        return response()->json(['message' => 'EPI deletado com sucesso!']);
     }
 }

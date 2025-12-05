@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Cadastro de EPI</title>
+    <title>Cadastro de Funcionário</title>
     <style>
         * {
             margin: 0;
@@ -41,12 +41,12 @@
         }
 
         /* Modal Container */
-        .modal-container {
+        .modal-content {
             background: white;
             border-radius: 12px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
             width: 90%;
-            max-width: 600px;
+            max-width: 900px;
             animation: slideIn 0.3s ease-in-out;
             max-height: 90vh;
             overflow-y: auto;
@@ -242,45 +242,266 @@
             display: block;
         }
 
+        /* Tabs */
+        .tabs-container {
+            margin-bottom: 2rem;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #ecf0f1;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+
+        .tab-button {
+            background: none;
+            border: none;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            color: #7f8c8d;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            min-width: fit-content;
+        }
+
+        .tab-button:hover {
+            color: #2c3e50;
+            background: #f8f9fa;
+        }
+
+        .tab-button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: linear-gradient(135deg, #667eea10, #764ba210);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Form Layout */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.span-2 {
+            grid-column: span 2;
+        }
+
+        .form-group.span-3 {
+            grid-column: span 2;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .required {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.75rem;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group input:invalid,
+        .form-group select:invalid {
+            border-color: #e74c3c;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* Field Errors */
+        .field-error {
+            color: #e74c3c;
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+            min-height: 1rem;
+            display: none;
+        }
+
+        .field-error.show {
+            display: block;
+        }
+
+        /* Section Titles */
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 2rem 0 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        /* Data Preview */
+        .data-preview {
+            background: #f8f9fa;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .preview-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .preview-item:last-child {
+            border-bottom: none;
+        }
+
+        .preview-label {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .preview-value {
+            color: #34495e;
+            text-align: right;
+            max-width: 60%;
+            word-break: break-word;
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            z-index: 1001;
+        }
+
+        .loading-spinner.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #ecf0f1;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         /* Responsive */
-        @media (max-width: 600px) {
-            .modal-container {
+        @media (max-width: 768px) {
+            .modal-content.large {
                 width: 95%;
-                max-height: 95vh;
+                margin: 1rem;
             }
-
-            .form-row {
+            
+            .form-grid {
                 grid-template-columns: 1fr;
+                gap: 1rem;
             }
+            
+            .form-group.span-2,
+            .form-group.span-3 {
+                grid-column: span 1;
+            }
+            
+            .tabs {
+                flex-wrap: wrap;
+            }
+            
+            .tab-button {
+                flex: 1;
+                min-width: auto;
+                padding: 0.75rem;
+                font-size: 0.9rem;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+        }
 
-            .modal-header,
-            .modal-body,
-            .modal-footer {
-                padding: 1.5rem;
-            }
+        /* Estados dinâmicos */
+        input[name="data_demissao"]:disabled {
+            background: #f8f9fa;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
 
-            .modal-header h2 {
-                font-size: 1.2rem;
-            }
+        .form-group.highlight {
+            animation: highlight 0.5s ease;
+        }
 
-            .modal-footer {
-                flex-direction: column-reverse;
-            }
-
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
+        @keyframes highlight {
+            0% { background: transparent; }
+            50% { background: rgba(102, 126, 234, 0.1); }
+            100% { background: transparent; }
         }
     </style>
 </head>
 <body>
     <!-- Modal -->
     <div class="modal-overlay" id="cadastroModal">
-        <div class="modal-container">
+        <div class="modal-content">
             <!-- Header -->
             <div class="modal-header">
-                <h2>📋 Cadastro de EPI</h2>
+                <h2>📋 Cadastro de Funcionário</h2>
                 <button class="close-btn" onclick="fecharModal()" title="Fechar">&times;</button>
             </div>
 
@@ -292,17 +513,17 @@
                 <div class="alert alert-warning" id="warningAlert"></div>
 
                 <!-- Form -->
-                <form id="cadastroForm" onsubmit="salvarEPI(event)">
+                <form id="cadastroForm" onsubmit="salvarFuncionario(event)">
                     @csrf
 
-                    <!-- Nome do EPI -->
+                    <!-- Nome do Funcionario -->
                     <div class="form-group">
-                        <label for="nome">Nome do EPI *</label>
+                        <label for="nome">Nome do Funcionário *</label>
                         <input 
                             type="text" 
                             id="nome" 
                             name="nome" 
-                            placeholder="Ex: Capacete de Segurança"
+                            placeholder="Ex: Luiz Silva"
                             required
                         >
                     </div>
@@ -310,15 +531,12 @@
                     <!-- Tipo e Categoria -->
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="tipo">Tipo *</label>
+                            <label for="tipo">Setor *</label>
                             <select id="tipo" name="tipo" required>
                                 <option value="">Selecione o tipo</option>
-                                <option value="capacete">Capacete</option>
-                                <option value="luva">Luva</option>
-                                <option value="bota">Bota</option>
-                                <option value="oculos">Óculos</option>
-                                <option value="mascara">Máscara</option>
-                                <option value="coletes">Colete</option>
+                                <option value="capacete">Estoque</option>
+                                <option value="luva">Financeiro</option>
+                                <option value="bota">Açougue</option>
                                 <option value="outro">Outro</option>
                             </select>
                         </div>
@@ -340,12 +558,12 @@
                     <!-- Quantidade e Norma -->
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="quantidade">Quantidade em Estoque *</label>
+                            <label for="quantidade">CPF *</label>
                             <input 
-                                type="number" 
-                                id="quantidade" 
-                                name="quantidade" 
-                                placeholder="0"
+                                type="string" 
+                                id="cpf" 
+                                name="cpf" 
+                                placeholder="000.000.000-00"
                                 min="0"
                                 required
                             >
@@ -365,20 +583,20 @@
                     <!-- Data de Validade -->
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="data_validade">Data de Validade</label>
+                            <label for="data_contrato">Data de Contrato</label>
                             <input 
                                 type="date" 
-                                id="data_validade" 
-                                name="data_validade"
+                                id="data_contrato" 
+                                name="data_contrato"
                             >
                         </div>
 
                         <div class="form-group">
-                            <label for="data_aquisicao">Data de Aquisição</label>
+                            <label for="data_desligamento">Data de Desligamento</label>
                             <input 
                                 type="date" 
-                                id="data_aquisicao" 
-                                name="data_aquisicao"
+                                id="data_desligamento" 
+                                name="data_desligamento"
                             >
                         </div>
                     </div>
@@ -389,34 +607,9 @@
                         <textarea 
                             id="descricao" 
                             name="descricao" 
-                            placeholder="Adicione informações adicionais sobre o EPI..."
+                            placeholder="Adicione informações adicionais sobre o Funcionário..."
                         ></textarea>
                     </div>
-
-                    <!-- Fabricante e Modelo -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="fabricante">Fabricante</label>
-                            <input 
-                                type="text" 
-                                id="fabricante" 
-                                name="fabricante" 
-                                placeholder="Ex: 3M do Brasil"
-                            >
-                        </div>
-
-                        <div class="form-group">
-                            <label for="modelo">Modelo</label>
-                            <input 
-                                type="text" 
-                                id="modelo" 
-                                name="modelo" 
-                                placeholder="Ex: H-700"
-                            >
-                        </div>
-                    </div>
-                </form>
-            </div>
 
             <!-- Footer -->
             <div class="modal-footer">
@@ -466,11 +659,11 @@
                 return;
             }
 
-            salvarEPI(event);
+            salvarFuncionario(event);
         }
 
-        // Salvar EPI
-        async function salvarEPI(event) {
+        // Salvar Func
+        async function salvarFuncionario(event) {
             event.preventDefault();
 
             const form = document.getElementById('cadastroForm');
@@ -480,7 +673,7 @@
             loadingSpinner.classList.add('active');
 
             try {
-                const response = await fetch('/api/epis', {
+                const response = await fetch('/api/funcionarios', {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
@@ -492,15 +685,15 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    mostraAlerta('EPI cadastrado com sucesso!', 'success');
+                    mostraAlerta('Funcionário cadastrado com sucesso!', 'success');
                     limparFormulario();
                     
                     setTimeout(() => {
                         fecharModal();
-                        location.reload(); // Atualizar página para ver o novo EPI
+                        location.reload(); // Atualizar página para ver o novo Funcionário
                     }, 2000);
                 } else {
-                    const erro = data.message || 'Erro ao cadastrar EPI';
+                    const erro = data.message || 'Erro ao cadastrar Funcionário';
                     mostraAlerta(erro, 'danger');
                 }
             } catch (error) {

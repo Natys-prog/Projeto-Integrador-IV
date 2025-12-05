@@ -129,7 +129,7 @@
                 </li>
             </ul>
             <div style="margin-top: 1.5rem;">
-                <a href="#" style="background: #f5576c; color: white; padding: 0.75rem 1.5rem; border-radius: 6px; text-decoration: none; display: inline-block;">
+                <a href="funcionarios" style="background: #f5576c; color: white; padding: 0.75rem 1.5rem; border-radius: 6px; text-decoration: none; display: inline-block;">
                     Ver Funcionários
                 </a>
             </div>
