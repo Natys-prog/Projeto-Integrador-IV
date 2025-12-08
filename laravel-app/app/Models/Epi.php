@@ -14,8 +14,8 @@ class Epi extends Model
     
     protected $fillable = [
         'nome',
-        'tipo',
         'tipo_epi_id', // FK para tipos_epi
+        'descricao_manual_tipo_epi',
         'codigo',
         'status',
         'fabricante',
@@ -23,7 +23,6 @@ class Epi extends Model
         'funcionario_id',
         'data_aquisicao',
         'data_vencimento',
-        'descricao',
     ];
 
     protected $casts = [

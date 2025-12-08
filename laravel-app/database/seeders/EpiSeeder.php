@@ -17,12 +17,22 @@ class EpiSeeder extends Seeder
         // Buscar funcionários existentes
         $funcionarios = Funcionario::all();
 
+        // Buscar tipos de EPI para usar os IDs corretos
+        $tipoCapacete = \App\Models\TipoEpi::where('codigo', 'capacete')->first();
+        $tipoOculos = \App\Models\TipoEpi::where('codigo', 'oculos')->first();
+        $tipoLuvas = \App\Models\TipoEpi::where('codigo', 'luvas')->first();
+        $tipoBotas = \App\Models\TipoEpi::where('codigo', 'botas')->first();
+        $tipoCintoSeguranca = \App\Models\TipoEpi::where('codigo', 'cinto_seguranca')->first();
+        $tipoMascara = \App\Models\TipoEpi::where('codigo', 'mascara')->first();
+        $tipoProtetorAuditivo = \App\Models\TipoEpi::where('codigo', 'protetor_auditivo')->first();
+        $tipoColeteRefletivo = \App\Models\TipoEpi::where('codigo', 'colete_refletivo')->first();
+
         $episData = [
             // Capacetes
             [
                 'nome' => 'Capacete de Segurança Branco MSA',
-                'tipo' => 'capacete',
-                'descricao' => 'Capacete de segurança classe A, cor branca, com suspensão de 4 pontos',
+                'tipo_epi_id' => $tipoCapacete?->id ?? 1,
+                'descricao_manual_tipo_epi' => 'Capacete de segurança classe A, cor branca, com suspensão de 4 pontos',
                 'codigo' => 'CAP001',
                 'data_aquisicao' => now()->subMonths(3),
                 'data_vencimento' => now()->addYears(5),
@@ -33,8 +43,8 @@ class EpiSeeder extends Seeder
             ],
             [
                 'nome' => 'Capacete de Segurança Azul 3M',
-                'tipo' => 'capacete',
-                'descricao' => 'Capacete de segurança classe A, cor azul, resistente a impactos',
+                'tipo_epi_id' => $tipoCapacete?->id ?? 1,
+                'descricao_manual_tipo_epi' => 'Capacete de segurança classe A, cor azul, resistente a impactos',
                 'codigo' => 'CAP002',
                 'data_aquisicao' => now()->subMonths(2),
                 'data_vencimento' => now()->addYears(5),
@@ -47,8 +57,8 @@ class EpiSeeder extends Seeder
             // Óculos de Proteção
             [
                 'nome' => 'Óculos de Proteção Incolor Honeywell',
-                'tipo' => 'oculos',
-                'descricao' => 'Óculos de proteção com lentes incolores, anti-embaçante',
+                'tipo_epi_id' => $tipoOculos?->id ?? 2,
+                'descricao_manual_tipo_epi' => 'Óculos de proteção com lentes incolores, anti-embaçante',
                 'codigo' => 'OCU001',
                 'data_aquisicao' => now()->subMonths(1),
                 'data_vencimento' => now()->addMonths(18),
@@ -59,8 +69,8 @@ class EpiSeeder extends Seeder
             ],
             [
                 'nome' => 'Óculos de Proteção Fumê Uvex',
-                'tipo' => 'oculos',
-                'descricao' => 'Óculos de proteção com lentes fumê, proteção UV',
+                'tipo_epi_id' => $tipoOculos?->id ?? 2,
+                'descricao_manual_tipo_epi' => 'Óculos de proteção com lentes fumê, proteção UV',
                 'codigo' => 'OCU002',
                 'data_aquisicao' => now()->subWeeks(2),
                 'data_vencimento' => now()->addMonths(18),
@@ -73,8 +83,8 @@ class EpiSeeder extends Seeder
             // Luvas
             [
                 'nome' => 'Luvas de Segurança Látex Ansell',
-                'tipo' => 'luvas',
-                'descricao' => 'Luvas de látex natural com punho longo, antiderrapante',
+                'tipo_epi_id' => $tipoLuvas?->id ?? 3,
+                'descricao_manual_tipo_epi' => 'Luvas de látex natural com punho longo, antiderrapante',
                 'codigo' => 'LUV001',
                 'data_aquisicao' => now()->subDays(15),
                 'data_vencimento' => now()->addMonths(6),
@@ -85,8 +95,8 @@ class EpiSeeder extends Seeder
             ],
             [
                 'nome' => 'Luvas de Segurança Nitrílica Kimberly-Clark',
-                'tipo' => 'luvas',
-                'descricao' => 'Luvas de nitrilo sem pó, alta resistência química',
+                'tipo_epi_id' => $tipoLuvas?->id ?? 3,
+                'descricao_manual_tipo_epi' => 'Luvas de nitrilo sem pó, alta resistência química',
                 'codigo' => 'LUV002',
                 'data_aquisicao' => now()->subDays(10),
                 'data_vencimento' => now()->addMonths(8),
@@ -99,8 +109,8 @@ class EpiSeeder extends Seeder
             // Botas
             [
                 'nome' => 'Bota de Segurança PVC Marluvas',
-                'tipo' => 'botas',
-                'descricao' => 'Bota de segurança em PVC com biqueira de aço, impermeável',
+                'tipo_epi_id' => $tipoBotas?->id ?? 3, // usar luvas como fallback
+                'descricao_manual_tipo_epi' => 'Bota de segurança em PVC com biqueira de aço, impermeável',
                 'codigo' => 'BOT001',
                 'data_aquisicao' => now()->subMonths(4),
                 'data_vencimento' => now()->addYears(2),
@@ -111,8 +121,8 @@ class EpiSeeder extends Seeder
             ],
             [
                 'nome' => 'Bota de Segurança Couro Bracol',
-                'tipo' => 'botas',
-                'descricao' => 'Bota de segurança em couro com solado antiderrapante',
+                'tipo_epi_id' => $tipoBotas?->id ?? 3, // usar luvas como fallback
+                'descricao_manual_tipo_epi' => 'Bota de segurança em couro com solado antiderrapante',
                 'codigo' => 'BOT002',
                 'data_aquisicao' => now()->subMonths(2),
                 'data_vencimento' => now()->addYears(3),
@@ -125,8 +135,8 @@ class EpiSeeder extends Seeder
             // Cintos de Segurança
             [
                 'nome' => 'Cinto de Segurança Paraquedista Altiseg',
-                'tipo' => 'cinto_seguranca',
-                'descricao' => 'Cinto de segurança tipo paraquedista com regulagem',
+                'tipo_epi_id' => $tipoCintoSeguranca?->id ?? 1, // usar capacete como fallback
+                'descricao_manual_tipo_epi' => 'Cinto de segurança tipo paraquedista com regulagem',
                 'codigo' => 'CIN001',
                 'data_aquisicao' => now()->subMonths(6),
                 'data_vencimento' => now()->addYears(5),
@@ -139,8 +149,8 @@ class EpiSeeder extends Seeder
             // Máscaras
             [
                 'nome' => 'Máscara Respiratória PFF2 3M',
-                'tipo' => 'mascara',
-                'descricao' => 'Máscara respiratória descartável PFF2, filtro de partículas',
+                'tipo_epi_id' => $tipoMascara?->id ?? 2, // usar óculos como fallback
+                'descricao_manual_tipo_epi' => 'Máscara respiratória descartável PFF2, filtro de partículas',
                 'codigo' => 'MAS001',
                 'data_aquisicao' => now()->subWeeks(1),
                 'data_vencimento' => now()->addMonths(3),
@@ -153,11 +163,11 @@ class EpiSeeder extends Seeder
             // Protetor Auditivo
             [
                 'nome' => 'Protetor Auditivo Tipo Concha Honeywell',
-                'tipo' => 'protetor_auditivo',
-                'descricao' => 'Protetor auditivo tipo concha, atenuação 25dB',
+                'tipo_epi_id' => $tipoProtetorAuditivo?->id ?? 2, // usar óculos como fallback
+                'descricao_manual_tipo_epi' => 'Protetor auditivo tipo concha, atenuação 28dB',
                 'codigo' => 'PRO001',
-                'data_aquisicao' => now()->subMonths(1),
-                'data_vencimento' => now()->addYears(2),
+                'data_aquisicao' => now()->subDays(30),
+                'data_vencimento' => now()->addYears(1),
                 'status' => 'ativo',
                 'fabricante' => 'Honeywell',
                 'lote' => 'LT2024011',
@@ -167,8 +177,8 @@ class EpiSeeder extends Seeder
             // Colete Refletivo
             [
                 'nome' => 'Colete Refletivo Alta Visibilidade',
-                'tipo' => 'colete_refletivo',
-                'descricao' => 'Colete refletivo classe 2, tecido mesh respirável',
+                'tipo_epi_id' => $tipoColeteRefletivo?->id ?? 1, // usar capacete como fallback
+                'descricao_manual_tipo_epi' => 'Colete refletivo classe 2, tecido mesh respirável',
                 'codigo' => 'COL001',
                 'data_aquisicao' => now()->subWeeks(3),
                 'data_vencimento' => now()->addYear(),
@@ -204,14 +214,14 @@ class EpiSeeder extends Seeder
      */
     private function createExpiringEpis()
     {
-        $tipos = ['capacete', 'oculos', 'luvas', 'botas', 'mascara'];
+        $tiposIds = [1, 2, 3, 4, 6]; // capacete, oculos, luvas, botas, mascara
         
         for ($i = 1; $i <= 15; $i++) {
             Epi::create([
                 'nome' => 'EPI Próximo Vencimento ' . str_pad($i, 2, '0', STR_PAD_LEFT),
-                'tipo' => $tipos[array_rand($tipos)],
+                'tipo_epi_id' => $tiposIds[array_rand($tiposIds)],
                 'codigo' => 'VENC' . str_pad($i, 3, '0', STR_PAD_LEFT),
-                'descricao' => 'EPI com vencimento próximo para teste de alertas',
+                'descricao_manual_tipo_epi' => 'EPI com vencimento próximo para teste de alertas',
                 'data_aquisicao' => now()->subYears(2),
                 'data_vencimento' => now()->addDays(rand(1, 30)), // 1 a 30 dias
                 'status' => 'ativo',
@@ -227,14 +237,14 @@ class EpiSeeder extends Seeder
      */
     private function createMaintenanceEpis()
     {
-        $tipos = ['capacete', 'botas', 'cinto_seguranca'];
+        $tiposIds = [1, 4, 5]; // capacete, botas, cinto_seguranca
         
         for ($i = 1; $i <= 8; $i++) {
             Epi::create([
                 'nome' => 'EPI Manutenção ' . str_pad($i, 2, '0', STR_PAD_LEFT),
-                'tipo' => $tipos[array_rand($tipos)],
+                'tipo_epi_id' => $tiposIds[array_rand($tiposIds)],
                 'codigo' => 'MANU' . str_pad($i, 3, '0', STR_PAD_LEFT),
-                'descricao' => 'EPI em processo de manutenção',
+                'descricao_manual_tipo_epi' => 'EPI em processo de manutenção',
                 'data_aquisicao' => now()->subMonths(6),
                 'data_vencimento' => now()->addMonths(6),
                 'status' => 'manutencao',

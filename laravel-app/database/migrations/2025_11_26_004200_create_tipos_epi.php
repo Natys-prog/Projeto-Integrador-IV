@@ -127,6 +127,89 @@ return new class extends Migration
     }
 
     /**
+     * Inserir dados iniciais dos tipos de EPI
+     */
+    private function insertInitialData(): void
+    {
+        $now = now();
+        
+        DB::table('tipos_epi')->insert([
+            [
+                'nome' => 'Capacete de Segurança',
+                'codigo' => 'CAP',
+                'descricao' => 'Proteção craniana contra impactos',
+                'categoria' => 'Proteção da Cabeça',
+                'validade_meses' => 60,
+                'status' => 'ativo',
+                'icone' => null,
+                'cor' => '#667eea',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'nome' => 'Óculos de Proteção',
+                'codigo' => 'OCU', 
+                'descricao' => 'Proteção dos olhos contra partículas e respingos',
+                'categoria' => 'Proteção dos Olhos',
+                'validade_meses' => 12,
+                'status' => 'ativo',
+                'icone' => null,
+                'cor' => '#667eea',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'nome' => 'Luvas de Segurança',
+                'codigo' => 'LUV',
+                'descricao' => 'Proteção das mãos contra riscos diversos',
+                'categoria' => 'Proteção das Mãos', 
+                'validade_meses' => 6,
+                'status' => 'ativo',
+                'icone' => null,
+                'cor' => '#667eea',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'nome' => 'Capacete de Segurança',
+                'codigo' => 'capacete',
+                'descricao' => 'Tipo de EPI essencial',
+                'categoria' => 'Proteção da Cabeça',
+                'validade_meses' => 12,
+                'status' => 'ativo',
+                'icone' => '⛑️',
+                'cor' => '#FF6B35',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'nome' => 'Óculos de Proteção',
+                'codigo' => 'oculos',
+                'descricao' => 'Tipo de EPI essencial',
+                'categoria' => 'Proteção dos Olhos',
+                'validade_meses' => 12,
+                'status' => 'ativo',
+                'icone' => '🥽',
+                'cor' => '#4ECDC4',
+                'created_at' => $now,
+                'updated_at' => $now
+            ],
+            [
+                'nome' => 'Luvas de Segurança',
+                'codigo' => 'luvas',
+                'descricao' => 'Tipo de EPI essencial',
+                'categoria' => 'Proteção das Mãos',
+                'validade_meses' => 12,
+                'status' => 'ativo',
+                'icone' => '🧤',
+                'cor' => '#45B7D1',
+                'created_at' => $now,
+                'updated_at' => $now
+            ]
+        ]);
+    }
+
+    /**
      * Reverse the migrations.
      */
     public function down(): void

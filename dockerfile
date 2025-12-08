@@ -59,7 +59,7 @@ RUN if [ -f "package.json" ]; then npm install && npm run build; else echo "No p
 
 # Configurar Laravel - Copiar .env.example se existir, senão criar básico
 RUN if [ -f ".env.example" ]; then cp .env.example .env; else \
-    echo "APP_NAME=\"Laravel EPI System\"\n\
+    echo "APP_NAME=\"LinkeSupermarket\"\n\
 APP_ENV=production\n\
 APP_KEY=\n\
 APP_DEBUG=false\n\
@@ -104,7 +104,7 @@ MAIL_PORT=2525\n\
 MAIL_USERNAME=null\n\
 MAIL_PASSWORD=null\n\
 MAIL_ENCRYPTION=null\n\
-MAIL_FROM_ADDRESS=\"hello@example.com\"\n\
+# MAIL_FROM_ADDRESS=\"suporte@example.com\"\n\
 MAIL_FROM_NAME=\"\${APP_NAME}\"" > .env; fi
 
 # Gerar chave da aplicação

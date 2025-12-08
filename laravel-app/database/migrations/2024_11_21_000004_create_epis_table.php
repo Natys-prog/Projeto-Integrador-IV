@@ -18,18 +18,7 @@ return new class extends Migration
         Schema::create('epis', function (Blueprint $table) {
             $table->id();
             $table->string('nome');
-            $table->enum('tipo', [
-                'capacete', 
-                'oculos', 
-                'luvas', 
-                'botas', 
-                'cinto_seguranca', 
-                'mascara', 
-                'protetor_auditivo',
-                'colete_refletivo',
-                'outros'
-            ]);
-            $table->text('descricao')->nullable();
+            $table->text('descricao_manual_tipo_epi')->nullable();
             $table->string('codigo')->unique();
             $table->date('data_aquisicao')->nullable();
             $table->date('data_vencimento')->nullable();
@@ -41,7 +30,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
             
-            $table->index(['tipo', 'status']);
+            $table->index(['tipo_epi_id', 'status']);
             $table->index('data_vencimento');
             $table->index('funcionario_id');
         });
@@ -59,48 +48,19 @@ return new class extends Migration
             Schema::create('tipos_epi', function (Blueprint $table) {
                 $table->id();
                 $table->string('nome');
-                $table->string('codigo', 20)->unique();
+                $table->string('codigo')->unique();
                 $table->text('descricao')->nullable();
                 $table->string('categoria')->nullable();
                 $table->integer('validade_meses')->default(12);
                 $table->enum('status', ['ativo', 'inativo'])->default('ativo');
+                $table->string('icone')->nullable();
+                $table->string('cor')->default('#667eea');
                 $table->timestamps();
                 $table->softDeletes();
+                
+                $table->index('status');
+                $table->index('categoria');
             });
-            
-            // Inserir tipos básicos
-            DB::table('tipos_epi')->insert([
-                [
-                    'nome' => 'Capacete de Segurança',
-                    'codigo' => 'CAP',
-                    'descricao' => 'Proteção craniana contra impactos',
-                    'categoria' => 'Proteção da Cabeça',
-                    'validade_meses' => 60,
-                    'status' => 'ativo',
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ],
-                [
-                    'nome' => 'Óculos de Proteção',
-                    'codigo' => 'OCU',
-                    'descricao' => 'Proteção dos olhos contra partículas e respingos',
-                    'categoria' => 'Proteção dos Olhos',
-                    'validade_meses' => 12,
-                    'status' => 'ativo',
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ],
-                [
-                    'nome' => 'Luvas de Segurança',
-                    'codigo' => 'LUV',
-                    'descricao' => 'Proteção das mãos contra riscos diversos',
-                    'categoria' => 'Proteção das Mãos',
-                    'validade_meses' => 6,
-                    'status' => 'ativo',
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ],
-            ]);
         }
     }
 

@@ -42,8 +42,8 @@ class EpiFactory extends Factory
 
         return [
             'nome' => $this->faker->randomElement($nomes[$tipo]) . ' ' . $this->faker->word(),
-            'tipo' => $tipo,
-            'descricao' => $this->faker->sentence(),
+            'tipo_epi_id' => $this->faker->numberBetween(1, 6), // usar apenas IDs existentes
+            'descricao_manual_tipo_epi' => $this->faker->sentence(),
             'codigo' => strtoupper($this->faker->unique()->bothify('???###')),
             'data_aquisicao' => $this->faker->dateTimeBetween('-1 year', 'now'),
             'data_vencimento' => $this->faker->optional(0.8)->dateTimeBetween('now', '+3 years'), // 80% têm vencimento

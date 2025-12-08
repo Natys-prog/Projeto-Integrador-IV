@@ -476,13 +476,13 @@
                         </div>
                     </div>
 
-                    <!-- Descrição -->
+                    <!-- Descrição Manual do Tipo -->
                     <div class="form-group full">
-                        <label for="descricao">Descrição</label>
+                        <label for="descricao_manual_tipo_epi">Descrição Manual do Tipo</label>
                         <textarea 
-                            id="descricao" 
-                            name="descricao" 
-                            placeholder="Adicione informações adicionais sobre o EPI..."
+                            id="descricao_manual_tipo_epi" 
+                            name="descricao_manual_tipo_epi" 
+                            placeholder="Adicione uma descrição específica para este tipo de EPI..."
                         ></textarea>
                     </div>
                 </form>
@@ -666,7 +666,7 @@
                     document.getElementById('funcionario_id').value = epi.funcionario_id || '';
                     document.getElementById('data_aquisicao').value = epi.data_aquisicao || '';
                     document.getElementById('data_vencimento').value = epi.data_vencimento || '';
-                    document.getElementById('descricao').value = epi.descricao || '';
+                    document.getElementById('descricao_manual_tipo_epi').value = epi.descricao_manual_tipo_epi || '';
                     
                     // Trocar para modo edição
                     modoEdicao = true;
@@ -699,7 +699,7 @@
                 funcionario_id: formData.get('funcionario_id') || null,
                 data_aquisicao: formData.get('data_aquisicao') || null,
                 data_vencimento: formData.get('data_vencimento') || null,
-                descricao: formData.get('descricao'),
+                descricao_manual_tipo_epi: formData.get('descricao_manual_tipo_epi'),
             };
             
             console.log('Dados do formulário:', data);
