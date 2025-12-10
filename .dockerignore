@@ -19,3 +19,4 @@ laravel-app/storage/framework/cache/*
 laravel-app/storage/framework/sessions/*
 laravel-app/storage/framework/views/*
 laravel-app/bootstrap/cache/*
+laravel-app/vendor/*
